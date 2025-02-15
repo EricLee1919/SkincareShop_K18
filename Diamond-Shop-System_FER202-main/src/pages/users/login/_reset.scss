@@ -1,0 +1,72 @@
+// _reset.scss
+
+.reset {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: url('https://gcs.tripi.vn/public-tripi/tripi-feed/img/474087ecU/anh-nen-powerpoint-xam-khoi_022119957.jpg') no-repeat center center fixed;
+  background-size: cover;
+
+
+  &__container {
+    background: #F5F5F5;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+
+    h2 {
+      margin-bottom: 1rem;
+      font-size: 2rem;
+      color: #333;
+    }
+
+    form {
+      .mb-3 {
+        margin-bottom: 1.5rem;
+
+        .MuiFormControl-root {
+          width: 100%;
+        }
+      }
+
+      button {
+        margin-top: 1.5rem;
+        width: 100%;
+        padding: 0.75rem;
+        border: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background 0.3s;
+
+        &.MuiButton-contained {
+          background: linear-gradient(45deg, #aaa 30%, #434343 90%);
+          color: white;
+          box-shadow: 0 3px 5px 2px rgba(0, 0, 0, 0.3);
+
+          &:hover {
+            background: linear-gradient(45deg, #434343 30%, #aaa 90%);
+          }
+        }
+      }
+
+      div {
+        margin-top: 1rem;
+        font-size: 0.9rem;
+        color: #555;
+
+        a {
+          color: #1976d2;
+          text-decoration: none;
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+  }
+}
