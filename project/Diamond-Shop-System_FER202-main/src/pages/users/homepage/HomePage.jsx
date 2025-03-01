@@ -51,9 +51,9 @@ const HomePage = () => {
           </Typography>
         </Container>
       </Box>
-
+    {/* Giới thiệu sản phẩm nổi bật */}
       <Typography variant="h4" gutterBottom style={{ textAlign: 'center', marginTop: '40px' }}>
-        Best Selling Products
+        Best Selling Products 
       </Typography>
 
       <Products />

@@ -12,7 +12,7 @@
     background: #F5F5F5;
     padding: 2rem;
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 400px;
     text-align: center;
@@ -43,12 +43,12 @@
         transition: background 0.3s;
 
         &.MuiButton-contained {
-          background: linear-gradient(45deg, #aaa 30%, #434343 90%);
+          background: linear-gradient(45deg, #248b8d 30%, #2c9a3e 90%);
           color: white;
-          box-shadow: 0 3px 5px 2px rgba(0, 0, 0, 0.3);
+          box-shadow:  0px 0px 8px rgba(26, 177, 122, 0.3);
 
           &:hover {
-            background: linear-gradient(45deg, #434343 30%, #aaa 90%);
+            background: linear-gradient(135deg, #0ba37b 0%, #068240 100%);
           }
         }
       }

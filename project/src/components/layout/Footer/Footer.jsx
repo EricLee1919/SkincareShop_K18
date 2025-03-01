@@ -10,7 +10,7 @@ import { FaFacebook, FaInstagram, FaLinkedin } from "react-icons/fa";
 import { Link as RouterLink } from "react-router-dom";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import PhoneIphoneOutlinedIcon from "@mui/icons-material/PhoneIphoneOutlined";
-import DiamondOutlinedIcon from "@mui/icons-material/DiamondOutlined";
+import Spa from "@mui/icons-material/Spa";
 
 const BannerImg = {
   backgroundImage: `url('https://wallpaperaccess.com/full/2474989.jpg')`,
@@ -85,7 +85,7 @@ const Footer = () => {
               onClick={scrollToTop}
               style={{ marginLeft: "3rem" }}
             >
-              <DiamondOutlinedIcon fontSize="large" sx={{ color: "#B19567" }} />
+              <Spa fontSize="large" sx={{ color: "#B19567" }} />
             </IconButton>
             <br />
             <Typography

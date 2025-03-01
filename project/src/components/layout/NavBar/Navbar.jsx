@@ -29,6 +29,7 @@ import { auth, logout } from "../../config/firebase.jsx"; // Cập nhật import
 import axios from "axios";
 import { RingLoader } from "react-spinners";
 import { useAuthState } from "react-firebase-hooks/auth"; // Sử dụng hook để kiểm tra trạng thái đăng nhập
+import Spa from "@mui/icons-material/Spa";
 
 const Navbar = () => {
   const [user, setUser] = useState([]);
@@ -147,19 +148,20 @@ const Navbar = () => {
       >
         <RingLoader color="#B19567" size={80} />
       </Box>
-    );
+    ); 
   }
 
   return (
-    <AppBar
-      position="fixed"
-      style={{
-        backgroundColor: "#ffffff",
-        color: "#000000",
-        boxShadow: "none",
-        borderBottom: "1px solid #e0e0e0",
-      }}
-    >
+  <AppBar
+    position="fixed"
+    style={{
+      backgroundColor: "#E3F2FD", 
+      color: "#000000",
+      boxShadow: "none",
+      borderBottom: "1px solid #90CAF9",
+    }}
+>
+
       <Container maxWidth="xl">
         <Toolbar
           disableGutters
@@ -198,7 +200,7 @@ const Navbar = () => {
                 },
               }}
             >
-              Diamonds
+              Product
             </Button>
             <Button
               color="inherit"
@@ -375,21 +377,22 @@ const Navbar = () => {
               left: "50%",
               transform: "translateX(-50%)",
               display: "flex",
-              alignItems: "center",
+              alignItems: "center", 
             }}
           >
             <IconButton component={Link} to="/" disableRipple>
-              <DiamondOutlinedIcon fontSize="large" sx={{ color: "#B19567" }} />
+              <Spa fontSize="large" sx={{ color: "#B19567" }} />
             </IconButton>
             <Typography
-              component={Link}
-              to="/"
-              variant="h4"
-              fontWeight="bold"
-              style={{ color: "#B19567", textDecoration: "none" }}
-            >
-             Beauty Shop
+                component={Link}
+                to="/"
+                variant="h4"
+                fontWeight="bold"
+                style={{ color: "#7EC8E3", textDecoration: "none" }} // Thay đổi màu sắc
+              >
+                Beauty Shop
             </Typography>
+
           </Box>
           <Box style={{ display: "flex", alignItems: "center" }}>
             <TextField

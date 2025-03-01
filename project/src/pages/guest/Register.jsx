@@ -86,18 +86,17 @@ function Register() {
             type="submit"
             variant="contained"
             sx={{
-              background: "linear-gradient(45deg, #aaa 30%, #434343 90%)",
+              background: "linear-gradient(45deg, #A0D8B3  30%, #F4EFEA  90%)",
               border: 0,
               borderRadius: 15,
-              boxShadow: "0 3px 5px 2px rgba(0, 0, 0, .3)",
-              color: "white",
+              boxShadow:  "0 3px 5px 2px rgba(160, 216, 179, 0.82)",
               height: 48,
               padding: "0 30px",
               fontSize: "1.2rem",
               fontWeight: "bold",
               textTransform: "none",
               "&:hover": {
-                background: "linear-gradient(45deg, #434343  30%, #aaa  90%)",
+                background: "linear-gradient(45deg,rgb(54, 107, 64)  30%, #aaa  90%)",
               },
             }}
           >
