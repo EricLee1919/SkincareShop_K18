@@ -91,6 +91,7 @@ const Profile = () => {
           value={user.fullname}
           onChange={handleInputChange}
         />
+         {/* Gioi tinh */}
         <FormControlLabel
           control={
             <Switch checked={user.gender} onChange={handleSwitchChange} />
