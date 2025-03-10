@@ -122,7 +122,7 @@ const Cart = () => {
           </Grid>
           <Grid item xs={1}></Grid>
           <Grid item xs={3}>
-            Produc
+            Product
           </Grid>
           <Grid item xs={2}>
             Price

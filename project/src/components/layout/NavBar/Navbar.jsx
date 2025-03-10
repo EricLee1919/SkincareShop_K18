@@ -22,7 +22,6 @@ import {
   KeyboardArrowDown as KeyboardArrowDownIcon,
 } from "@mui/icons-material";
 import { Link, useNavigate } from "react-router-dom";
-import DiamondOutlinedIcon from "@mui/icons-material/DiamondOutlined";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { auth, logout } from "../../config/firebase.jsx"; // Cập nhật import
@@ -43,6 +42,9 @@ const Navbar = () => {
   const navigate = useNavigate();
   const cartItemCount = useSelector((state) => state.cart.items.length);
   const [userAuth, loadingAuth] = useAuthState(auth); // Kiểm tra trạng thái đăng nhập
+  const [anchorElCategory, setAnchorElCategory] = useState(null);
+const [closeTimerCategory, setCloseTimerCategory] = useState(null);
+
 
   useEffect(() => {
     axios
@@ -56,6 +58,36 @@ const Navbar = () => {
         setLoading(false);
       });
   }, []);
+
+  const handleMouseOverCategory = (event) => {
+    if (closeTimerCategory) {
+      clearTimeout(closeTimerCategory);
+      setCloseTimerCategory(null);
+    }
+    setAnchorElCategory(event.currentTarget);
+  };
+  
+  const handleMouseOutCategory = () => {
+    const timer = setTimeout(() => {
+      setAnchorElCategory(null);
+    }, 1000);
+    setCloseTimerCategory(timer);
+  };
+  
+  const handleMenuEnterCategory = () => {
+    if (closeTimerCategory) {
+      clearTimeout(closeTimerCategory);
+      setCloseTimerCategory(null);
+    }
+  };
+  
+  const handleMenuLeaveCategory = () => {
+    const timer = setTimeout(() => {
+      setAnchorElCategory(null);
+    }, 1000);
+    setCloseTimerCategory(timer);
+  };
+  
 
   const handleMouseOverBlog = (event) => {
     if (closeTimerBlog) {
@@ -202,6 +234,66 @@ const Navbar = () => {
             >
               Product
             </Button>
+            {/*Start of cate*/}
+            {/* Start of Category dropdown */}
+<Button
+  component={Link}
+  to="#"
+  color="inherit"
+  size="small"
+  disableRipple
+  onMouseOver={handleMouseOverCategory}
+  onMouseOut={handleMouseOutCategory}
+  endIcon={<KeyboardArrowDownIcon />}
+  sx={{
+    "&:hover": { color: "#B19567", backgroundColor: "transparent" },
+  }}
+>
+  Category
+</Button>
+<Menu
+  anchorEl={anchorElCategory}
+  open={Boolean(anchorElCategory)}
+  onClose={handleMouseOutCategory}
+  MenuListProps={{
+    onMouseLeave: handleMenuLeaveCategory,
+    onMouseEnter: handleMenuEnterCategory,
+    onClick: () => setAnchorElCategory(null),
+  }}
+>
+  <MenuItem
+    component={Link}
+    to="/category/skincare"
+    disableRipple
+    sx={{
+      "&:hover": { color: "#B19567", backgroundColor: "transparent" },
+    }}
+  >
+    Chăm sóc da
+  </MenuItem>
+  <MenuItem
+    component={Link}
+    to="/category/makeup"
+    disableRipple
+    sx={{
+      "&:hover": { color: "#B19567", backgroundColor: "transparent" },
+    }}
+  >
+    Trang điểm
+  </MenuItem>
+  <MenuItem
+    component={Link}
+    to="/category/perfume"
+    disableRipple
+    sx={{
+      "&:hover": { color: "#B19567", backgroundColor: "transparent" },
+    }}
+  >
+    Nước hoa
+  </MenuItem>
+</Menu>
+{/* End of Category dropdown */}
+
             <Button
               color="inherit"
               size="small"
