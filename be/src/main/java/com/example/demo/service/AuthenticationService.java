@@ -77,4 +77,42 @@ public class AuthenticationService implements UserDetailsService {
 
          return authenticationResponse;
     }
+
+    public AuthenticationResponse processGoogleLogin(String email, String fullName, String googleId, String photoUrl) {
+        // Check if user exists with this email
+        Account account = authenticationRepository.findByEmail(email).orElse(null);
+        
+        // If user doesn't exist, create a new account
+        if (account == null) {
+            account = new Account();
+            account.setEmail(email);
+            account.setFullName(fullName);
+            // Generate a username from email (remove special chars and use part before @)
+            String username = email.split("@")[0].replaceAll("[^a-zA-Z0-9]", "");
+            // Check if username exists, if so, add random numbers
+            if (authenticationRepository.findByUsername(username).isPresent()) {
+                username = username + System.currentTimeMillis() % 1000;
+            }
+            account.setUsername(username);
+            // Set a secure random password that user can reset later
+            account.setPassword(passwordEncoder.encode(googleId + System.currentTimeMillis()));
+            account.setRoleEnum(RoleEnum.CUSTOMER);
+            // Save the new account
+            account = authenticationRepository.save(account);
+        }
+        
+        // Generate token
+        String token = tokenService.generateToken(account);
+        
+        // Create response
+        AuthenticationResponse authenticationResponse = new AuthenticationResponse();
+        authenticationResponse.setEmail(account.getEmail());
+        authenticationResponse.setId(account.getId());
+        authenticationResponse.setFullName(account.getFullName());
+        authenticationResponse.setUsername(account.getUsername());
+        authenticationResponse.setRoleEnum(account.getRoleEnum());
+        authenticationResponse.setToken(token);
+        
+        return authenticationResponse;
+    }
 }
