@@ -24,7 +24,7 @@ public class Account implements UserDetails {
 
     public String fullName;
 
-
+    @Column(unique = true)
     public String email;
 
     @Column(unique = true)
@@ -39,9 +39,16 @@ public class Account implements UserDetails {
     @JsonIgnore
     List<Order> orders = new ArrayList<>();
 
-    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "account",cascade =  CascadeType.ALL)
     @JsonIgnore
-    List<Booking> bookings = new ArrayList<>();
+    List<Rating> ratings = new ArrayList<>();
+
+    @OneToMany(mappedBy = "account",cascade =  CascadeType.ALL)
+    @JsonIgnore
+    List<Report> reports = new ArrayList<>();
+
+
+
 
     public Account() {
 

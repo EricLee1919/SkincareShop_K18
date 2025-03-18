@@ -1,10 +1,10 @@
 package com.example.demo.api;
 
 import com.example.demo.entity.Account;
-import com.example.demo.entity.request.AccountRequest;
-import com.example.demo.entity.request.AuthenticationRequest;
+import com.example.demo.entity.request.*;
 import com.example.demo.entity.response.AuthenticationResponse;
 import com.example.demo.service.AuthenticationService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("api")
+@SecurityRequirement(name = "api")
 public class AuthenticationAPI {
 
     @Autowired
@@ -31,5 +32,25 @@ public class AuthenticationAPI {
         AuthenticationResponse authenticationResponse = authenticationService.login(authenticationRequest);
         return ResponseEntity.ok(authenticationResponse);
     }
+
+    @PostMapping("login-google")
+    public ResponseEntity loginGoogle(@RequestBody LoginGoogleRequest loginGoogleRequest) {
+        AuthenticationResponse authenticationResponse = authenticationService.loginGoogle(loginGoogleRequest);
+        return ResponseEntity.ok(authenticationResponse);
+    }
+
+
+    @PostMapping("forgot-password")
+    public ResponseEntity forgotPassword(@RequestBody ForgotPasswordRequest forgotPasswordRequest) {
+       authenticationService.forgotPassword(forgotPasswordRequest);
+        return ResponseEntity.ok("Fogot Password Successfully");
+    }
+
+    @PostMapping("reset-password")
+    public ResponseEntity resetPassword(@RequestBody ResetPasswordRequest resetPasswordRequest) {
+        authenticationService.resetPassword(resetPasswordRequest);
+        return ResponseEntity.ok("Reset Password Successfully");
+    }
+
 
 }
