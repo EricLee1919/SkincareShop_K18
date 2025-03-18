@@ -1,11 +1,16 @@
 package com.example.demo.service;
 
 import com.example.demo.entity.Account;
-import com.example.demo.entity.request.AccountRequest;
-import com.example.demo.entity.request.AuthenticationRequest;
+import com.example.demo.entity.request.*;
 import com.example.demo.entity.response.AuthenticationResponse;
 import com.example.demo.enums.RoleEnum;
+import com.example.demo.exception.exceptions.NotFoundException;
+import com.example.demo.model.EmailDetail;
 import com.example.demo.repository.AuthenticationRepository;
+import com.example.demo.utils.AccountUtils;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,6 +34,12 @@ public class AuthenticationService implements UserDetailsService {
 
     @Autowired
     TokenService tokenService;
+
+    @Autowired
+    EmailService emailService;
+
+    @Autowired
+    AccountUtils accountUtils;
 
     public Account register(AccountRequest accountRequest){
         // xử lý logic
@@ -78,41 +89,68 @@ public class AuthenticationService implements UserDetailsService {
          return authenticationResponse;
     }
 
-    public AuthenticationResponse processGoogleLogin(String email, String fullName, String googleId, String photoUrl) {
-        // Check if user exists with this email
-        Account account = authenticationRepository.findByEmail(email).orElse(null);
-        
-        // If user doesn't exist, create a new account
-        if (account == null) {
-            account = new Account();
-            account.setEmail(email);
-            account.setFullName(fullName);
-            // Generate a username from email (remove special chars and use part before @)
-            String username = email.split("@")[0].replaceAll("[^a-zA-Z0-9]", "");
-            // Check if username exists, if so, add random numbers
-            if (authenticationRepository.findByUsername(username).isPresent()) {
-                username = username + System.currentTimeMillis() % 1000;
+    public AuthenticationResponse loginGoogle(LoginGoogleRequest loginGoogleRequest) {
+        try {
+            FirebaseToken decodeToken = FirebaseAuth.getInstance().verifyIdToken(loginGoogleRequest.getToken());
+            String email = decodeToken.getEmail();
+            Account account = authenticationRepository.findByEmail(email);
+
+            // neu login gg tk email nay chua dc dk thi dk
+            if(account == null){
+                account = new Account();
+                account.setFullName(decodeToken.getName());
+                account.setEmail(email);
+                account.setUsername(email);
+                account.setRoleEnum(RoleEnum.CUSTOMER);
+                account = authenticationRepository.save(account);
             }
-            account.setUsername(username);
-            // Set a secure random password that user can reset later
-            account.setPassword(passwordEncoder.encode(googleId + System.currentTimeMillis()));
-            account.setRoleEnum(RoleEnum.CUSTOMER);
-            // Save the new account
-            account = authenticationRepository.save(account);
+            String token = tokenService.generateToken(account);
+
+            AuthenticationResponse authenticationResponse = new AuthenticationResponse();
+            authenticationResponse.setEmail(account.getEmail());
+            authenticationResponse.setId(account.getId());
+            authenticationResponse.setFullName(account.getFullName());
+            authenticationResponse.setUsername(account.getUsername());
+            authenticationResponse.setRoleEnum(account.getRoleEnum());
+            authenticationResponse.setToken(token);
+
+
+            return authenticationResponse;
+        } catch (FirebaseAuthException e) {
+            e.printStackTrace();
         }
-        
-        // Generate token
-        String token = tokenService.generateToken(account);
-        
-        // Create response
-        AuthenticationResponse authenticationResponse = new AuthenticationResponse();
-        authenticationResponse.setEmail(account.getEmail());
-        authenticationResponse.setId(account.getId());
-        authenticationResponse.setFullName(account.getFullName());
-        authenticationResponse.setUsername(account.getUsername());
-        authenticationResponse.setRoleEnum(account.getRoleEnum());
-        authenticationResponse.setToken(token);
-        
-        return authenticationResponse;
+
+        return null;
+
+    }
+
+    public void forgotPassword(ForgotPasswordRequest forgotPasswordRequest) {
+        Account account = authenticationRepository.findByEmail(forgotPasswordRequest.getEmail());
+        if(account == null){
+            throw new NotFoundException("User not found");
+        }
+        EmailDetail emailDetail = new EmailDetail();
+        emailDetail.setRecipient(account.getEmail()); // set email dc gui toi ai
+        emailDetail.setSubject("Reset Password for account  " + account.getEmail() + "!"); // ten tieu de email
+        emailDetail.setMsgBody("aaa");
+        emailDetail.setButtonValue("Reset Password"); // gia tri cua button trong form email
+        emailDetail.setFullName(account.getFullName());
+        emailDetail.setLink("https://fodoshi.shop?token=" + tokenService.generateToken(account));
+
+        // cho qua truoc gui mail sau
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                emailService.sendMailTemplate(emailDetail);
+            }
+        };
+        new Thread(r).start();
+
+    }
+
+    public void resetPassword(ResetPasswordRequest resetPasswordRequest) {
+        Account account = accountUtils.getCurrentAccount();
+        account.setPassword(passwordEncoder.encode(resetPasswordRequest.getPassword()));
+        authenticationRepository.save(account);
     }
 }

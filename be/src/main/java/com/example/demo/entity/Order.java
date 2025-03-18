@@ -1,6 +1,8 @@
 package com.example.demo.entity;
 
 import com.example.demo.enums.OrderStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.firebase.database.core.Repo;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -30,4 +32,8 @@ public class Order {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     List<OrderDetail> orderDetails = new ArrayList<>();
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @JsonIgnore
+    List<Report> reports = new ArrayList<>();
 }

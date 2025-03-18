@@ -47,6 +47,10 @@ public class Product {
     @JsonIgnore
     List<OrderDetail> orderDetails = new ArrayList<>();
 
+
+    @OneToMany(mappedBy = "product", cascade =  CascadeType.ALL)
+    List<Rating> ratings = new ArrayList<>();
+
     public Product(long id, String name, float price, int quantity, String image, String code, boolean isDeleted, Category category) {
         this.id = id;
         this.name = name;

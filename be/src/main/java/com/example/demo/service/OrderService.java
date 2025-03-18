@@ -84,7 +84,7 @@ public class OrderService {
         String tmnCode = "K2035S4C";
         String secretKey = "6E93KTQ6EHNWFUIIIGJW3S9URPTN4MOU";
         String vnpUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-        String returnURL = "http://localhost:8080?orderId="+order.getId();
+        String returnURL = "http://localhost:5173/payment-result?orderId="+order.getId();
 
         String currCode = "VND";
         Map<String, String> vnpParams = new TreeMap<>();
