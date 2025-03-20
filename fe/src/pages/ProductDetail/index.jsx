@@ -1,26 +1,31 @@
-import { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { Favorite, ShoppingCart } from "@mui/icons-material";
 import {
-  Container,
-  Grid,
-  Typography,
   Box,
   Button,
-  Rating,
   Chip,
+  Container,
   Divider,
-} from '@mui/material';
-import { ShoppingCart, Favorite } from '@mui/icons-material';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchProductById } from '../../store/slices/productSlice';
-import { addToCart } from '../../store/slices/cartSlice';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
-import ErrorMessage from '../../components/common/ErrorMessage';
+  Grid,
+  Rating,
+  Typography,
+} from "@mui/material";
+import numeral from "numeral";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import ErrorMessage from "../../components/common/ErrorMessage";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
+import { addToCart } from "../../store/slices/cartSlice";
+import { fetchProductById } from "../../store/slices/productSlice";
 
 const ProductDetail = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
-  const { selectedProduct: product, loading, error } = useSelector((state) => state.products);
+  const {
+    selectedProduct: product,
+    loading,
+    error,
+  } = useSelector((state) => state.products);
   const { items } = useSelector((state) => state.cart);
   const isInCart = items.some((item) => item.id === product?.id);
 
@@ -41,7 +46,12 @@ const ProductDetail = () => {
   }
 
   if (error) {
-    return <ErrorMessage message={error} onRetry={() => dispatch(fetchProductById(id))} />;
+    return (
+      <ErrorMessage
+        message={error}
+        onRetry={() => dispatch(fetchProductById(id))}
+      />
+    );
   }
 
   if (!product) {
@@ -57,8 +67,8 @@ const ProductDetail = () => {
             src={product.image}
             alt={product.name}
             sx={{
-              width: '100%',
-              height: 'auto',
+              width: "100%",
+              height: "auto",
               borderRadius: 2,
               boxShadow: 3,
             }}
@@ -78,12 +88,12 @@ const ProductDetail = () => {
           </Box>
 
           <Typography variant="h5" color="primary" gutterBottom>
-            ${product.price.toFixed(2)}
+            {product.price && numeral(product.price).format("0,0")} đ
           </Typography>
 
           {product.category && (
             <Chip
-              label={product.category}
+              label={product.category.name}
               color="primary"
               variant="outlined"
               sx={{ mb: 2 }}
@@ -106,7 +116,7 @@ const ProductDetail = () => {
               disabled={isInCart}
               fullWidth
             >
-              {isInCart ? 'In Cart' : 'Add to Cart'}
+              {isInCart ? "In Cart" : "Add to Cart"}
             </Button>
             <Button
               variant="outlined"
@@ -124,4 +134,4 @@ const ProductDetail = () => {
   );
 };
 
-export default ProductDetail; 
+export default ProductDetail;

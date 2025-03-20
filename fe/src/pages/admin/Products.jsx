@@ -1,38 +1,31 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Add, ArrowBack, Delete, Edit, Search } from "@mui/icons-material";
 import {
+  Alert,
   Box,
-  Container,
-  Paper,
-  Typography,
   Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TablePagination,
-  IconButton,
   Chip,
-  TextField,
-  InputAdornment,
+  CircularProgress,
+  Container,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Alert,
-  CircularProgress,
-} from '@mui/material';
-import {
-  Add,
-  Edit,
-  Delete,
-  Search,
-  FilterList,
-  ArrowBack,
-} from '@mui/icons-material';
+  IconButton,
+  InputAdornment,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TablePagination,
+  TableRow,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const AdminProducts = () => {
   const navigate = useNavigate();
@@ -40,28 +33,28 @@ const AdminProducts = () => {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [error, setError] = useState(null);
-  
+
   // Fetch products data
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        
-        const response = await fetch('http://localhost:8080/api/product');
+
+        const response = await fetch("http://localhost:8080/api/product");
         if (!response.ok) {
-          throw new Error('Failed to fetch products');
+          throw new Error("Failed to fetch products");
         }
-        
+
         const data = await response.json();
         setProducts(data);
         setLoading(false);
       } catch (err) {
-        console.error('Error fetching products:', err);
-        setError('Failed to fetch products. Please try again.');
+        console.error("Error fetching products:", err);
+        setError("Failed to fetch products. Please try again.");
         setLoading(false);
       }
     };
@@ -72,20 +65,20 @@ const AdminProducts = () => {
   // Check if user is admin
   useEffect(() => {
     const checkAdmin = () => {
-      const storedUser = localStorage.getItem('user');
+      const storedUser = localStorage.getItem("user");
       if (storedUser) {
         try {
           const userData = JSON.parse(storedUser);
           // Check if user has manager role
-          if (userData.roleEnum !== 'MANAGER') {
-            navigate('/');
+          if (userData.roleEnum !== "MANAGER") {
+            navigate("/");
           }
         } catch (error) {
-          console.error('Failed to parse user data:', error);
-          navigate('/login');
+          console.error("Failed to parse user data:", error);
+          navigate("/login");
         }
       } else {
-        navigate('/login');
+        navigate("/login");
       }
     };
 
@@ -107,7 +100,7 @@ const AdminProducts = () => {
   };
 
   const handleAddProduct = () => {
-    navigate('/admin/products/add');
+    navigate("/admin/products/add");
   };
 
   const handleEditProduct = (productId) => {
@@ -122,32 +115,37 @@ const AdminProducts = () => {
   const handleDeleteConfirm = async () => {
     try {
       if (!selectedProduct) return;
-      
-      const token = localStorage.getItem('token');
+
+      const token = localStorage.getItem("token");
       if (!token) {
-        throw new Error('Authentication token is missing');
+        throw new Error("Authentication token is missing");
       }
-      
+
       // Make API call to delete product
-      const response = await fetch(`http://localhost:8080/api/product/${selectedProduct.id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      
+      const response = await fetch(
+        `http://localhost:8080/api/product/${selectedProduct.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
       if (!response.ok) {
-        throw new Error('Failed to delete product');
+        throw new Error("Failed to delete product");
       }
-      
+
       // Update local state by removing the deleted product
-      setProducts(products.filter(product => product.id !== selectedProduct.id));
-      
+      setProducts(
+        products.filter((product) => product.id !== selectedProduct.id)
+      );
+
       setOpenDeleteDialog(false);
       setSelectedProduct(null);
     } catch (err) {
-      console.error('Error deleting product:', err);
-      setError('Failed to delete product. Please try again.');
+      console.error("Error deleting product:", err);
+      setError("Failed to delete product. Please try again.");
     }
   };
 
@@ -156,10 +154,12 @@ const AdminProducts = () => {
     setSelectedProduct(null);
   };
 
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (product.category && product.category.name && 
-     product.category.name.toLowerCase().includes(searchQuery.toLowerCase()))
+  const filteredProducts = products.filter(
+    (product) =>
+      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (product.category &&
+        product.category.name &&
+        product.category.name.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   const paginatedProducts = filteredProducts.slice(
@@ -168,22 +168,19 @@ const AdminProducts = () => {
   );
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: "flex" }}>
       {/* Main content */}
       <Box
         component="main"
         sx={{
           flexGrow: 1,
           p: 3,
-          width: '100%',
+          width: "100%",
         }}
       >
         <Container maxWidth="lg">
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
-            <IconButton 
-              sx={{ mr: 2 }} 
-              onClick={() => navigate('/admin')}
-            >
+          <Box sx={{ display: "flex", alignItems: "center", mb: 4 }}>
+            <IconButton sx={{ mr: 2 }} onClick={() => navigate("/admin")}>
               <ArrowBack />
             </IconButton>
             <Typography variant="h4" component="h1" sx={{ flexGrow: 1 }}>
@@ -205,7 +202,7 @@ const AdminProducts = () => {
             </Alert>
           )}
 
-          <Paper sx={{ width: '100%', mb: 2 }}>
+          <Paper sx={{ width: "100%", mb: 2 }}>
             <Box sx={{ p: 2 }}>
               <TextField
                 fullWidth
@@ -242,7 +239,13 @@ const AdminProducts = () => {
                   {loading ? (
                     <TableRow>
                       <TableCell colSpan={9} align="center">
-                        <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            p: 2,
+                          }}
+                        >
                           <CircularProgress />
                         </Box>
                       </TableCell>
@@ -263,7 +266,7 @@ const AdminProducts = () => {
                             sx={{
                               height: 50,
                               width: 50,
-                              objectFit: 'cover',
+                              objectFit: "cover",
                               borderRadius: 1,
                             }}
                             src={product.image}
@@ -277,8 +280,8 @@ const AdminProducts = () => {
                         <TableCell>{product.code}</TableCell>
                         <TableCell>
                           <Chip
-                            label={!product.isDeleted ? 'Active' : 'Inactive'}
-                            color={!product.isDeleted ? 'success' : 'default'}
+                            label={!product.isDeleted ? "Active" : "Inactive"}
+                            color={!product.isDeleted ? "success" : "default"}
                             size="small"
                           />
                         </TableCell>
@@ -302,7 +305,7 @@ const AdminProducts = () => {
                 </TableBody>
               </Table>
             </TableContainer>
-            
+
             <TablePagination
               rowsPerPageOptions={[5, 10, 25]}
               component="div"
@@ -317,21 +320,21 @@ const AdminProducts = () => {
       </Box>
 
       {/* Delete Confirmation Dialog */}
-      <Dialog
-        open={openDeleteDialog}
-        onClose={handleDeleteCancel}
-      >
-        <DialogTitle>
-          Confirm Delete
-        </DialogTitle>
+      <Dialog open={openDeleteDialog} onClose={handleDeleteCancel}>
+        <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete the product "{selectedProduct?.name}"? This action cannot be undone.
+            Are you sure you want to delete the product "{selectedProduct?.name}
+            "? This action cannot be undone.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDeleteCancel}>Cancel</Button>
-          <Button onClick={handleDeleteConfirm} color="error" variant="contained">
+          <Button
+            onClick={handleDeleteConfirm}
+            color="error"
+            variant="contained"
+          >
             Delete
           </Button>
         </DialogActions>
@@ -340,4 +343,4 @@ const AdminProducts = () => {
   );
 };
 
-export default AdminProducts; 
+export default AdminProducts;

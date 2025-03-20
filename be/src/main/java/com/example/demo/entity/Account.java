@@ -30,6 +30,7 @@ public class Account implements UserDetails {
     @Column(unique = true)
     public String username;
 
+    @JsonIgnore
     public String password;
 
     @Enumerated(value = EnumType.STRING)

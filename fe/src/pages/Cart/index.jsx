@@ -1,20 +1,26 @@
+import { Add, Delete, Remove } from "@mui/icons-material";
 import {
-  Container,
-  Typography,
-  Grid,
+  Box,
+  Button,
   Card,
   CardContent,
   CardMedia,
-  IconButton,
-  Button,
-  Box,
+  Container,
   Divider,
+  Grid,
+  IconButton,
   TextField,
-} from '@mui/material';
-import { Add, Remove, Delete } from '@mui/icons-material';
-import { useDispatch, useSelector } from 'react-redux';
-import { removeFromCart, updateQuantity, clearCart, selectCartTotal } from '../../store/slices/cartSlice';
-import { useNavigate } from 'react-router-dom';
+  Typography,
+} from "@mui/material";
+import numeral from "numeral";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import {
+  clearCart,
+  removeFromCart,
+  selectCartTotal,
+  updateQuantity,
+} from "../../store/slices/cartSlice";
 
 const Cart = () => {
   const dispatch = useDispatch();
@@ -35,7 +41,7 @@ const Cart = () => {
   };
 
   const handleCheckout = () => {
-    navigate('/checkout');
+    navigate("/checkout");
   };
 
   if (cartItems.length === 0) {
@@ -48,7 +54,7 @@ const Cart = () => {
           <Button
             variant="contained"
             color="primary"
-            onClick={() => navigate('/products')}
+            onClick={() => navigate("/products")}
             sx={{ mt: 2 }}
           >
             Continue Shopping
@@ -76,17 +82,25 @@ const Cart = () => {
                       height="120"
                       image={item.image}
                       alt={item.name}
-                      sx={{ objectFit: 'cover', borderRadius: 1 }}
+                      sx={{ objectFit: "cover", borderRadius: 1 }}
                     />
                   </Grid>
                   <Grid item xs={9}>
-                    <Box display="flex" justifyContent="space-between" alignItems="flex-start">
+                    <Box
+                      display="flex"
+                      justifyContent="space-between"
+                      alignItems="flex-start"
+                    >
                       <Box>
                         <Typography variant="h6" gutterBottom>
                           {item.name}
                         </Typography>
-                        <Typography variant="body2" color="text.secondary" gutterBottom>
-                          ${item.price.toFixed(2)}
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          gutterBottom
+                        >
+                          {item.price && numeral(item.price).format("0,0")} đ
                         </Typography>
                       </Box>
                       <IconButton
@@ -100,7 +114,9 @@ const Cart = () => {
                     <Box display="flex" alignItems="center" mt={1}>
                       <IconButton
                         size="small"
-                        onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+                        onClick={() =>
+                          handleQuantityChange(item.id, item.quantity - 1)
+                        }
                         disabled={item.quantity <= 1}
                       >
                         <Remove />
@@ -114,17 +130,19 @@ const Cart = () => {
                             handleQuantityChange(item.id, value);
                           }
                         }}
-                        inputProps={{ min: 1, style: { textAlign: 'center' } }}
+                        inputProps={{ min: 1, style: { textAlign: "center" } }}
                         sx={{ width: 60, mx: 1 }}
                       />
                       <IconButton
                         size="small"
-                        onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                        onClick={() =>
+                          handleQuantityChange(item.id, item.quantity + 1)
+                        }
                       >
                         <Add />
                       </IconButton>
-                      <Typography variant="body1" sx={{ ml: 'auto' }}>
-                        ${(item.price * item.quantity).toFixed(2)}
+                      <Typography variant="body1" sx={{ ml: "auto" }}>
+                        {numeral(item.price * item.quantity).format("0,0")} đ
                       </Typography>
                     </Box>
                   </Grid>
@@ -150,7 +168,9 @@ const Cart = () => {
               </Typography>
               <Box display="flex" justifyContent="space-between" mb={2}>
                 <Typography>Subtotal</Typography>
-                <Typography>${cartTotal.toFixed(2)}</Typography>
+                <Typography>
+                  {cartTotal && numeral(cartTotal).format("0,0")} đ
+                </Typography>
               </Box>
               <Box display="flex" justifyContent="space-between" mb={2}>
                 <Typography>Shipping</Typography>
@@ -159,7 +179,9 @@ const Cart = () => {
               <Divider sx={{ my: 2 }} />
               <Box display="flex" justifyContent="space-between" mb={2}>
                 <Typography variant="h6">Total</Typography>
-                <Typography variant="h6">${cartTotal.toFixed(2)}</Typography>
+                <Typography variant="h6">
+                  {cartTotal && numeral(cartTotal).format("0,0")} đ
+                </Typography>
               </Box>
               <Button
                 variant="contained"
@@ -178,4 +200,4 @@ const Cart = () => {
   );
 };
 
-export default Cart; 
+export default Cart;

@@ -1,30 +1,29 @@
-import { useState, useEffect } from 'react';
-import { Box, Container, Grid, Typography } from '@mui/material';
-import ProductGrid from '../../components/product/ProductGrid';
-import ProductFilter from '../../components/product/ProductFilter';
-import ProductSearch from '../../components/product/ProductSearch';
-import ProductSort from '../../components/product/ProductSort';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchProducts } from '../../store/slices/productSlice';
+import { Box, Container, Grid, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import ProductFilter from "../../components/product/ProductFilter";
+import ProductGrid from "../../components/product/ProductGrid";
+import ProductSort from "../../components/product/ProductSort";
+import { fetchProducts } from "../../store/slices/productSlice";
 
 const Products = () => {
   const dispatch = useDispatch();
   const { products, loading, error } = useSelector((state) => state.products);
   const [filters, setFilters] = useState({
-    category: '',
+    category: "",
     priceRange: [0, 1000],
     rating: 0,
   });
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState('newest');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState("newest");
 
   useEffect(() => {
     dispatch(fetchProducts({ filters, searchTerm, sortBy }));
   }, [dispatch, filters, searchTerm, sortBy]);
 
   // Filter out deleted products, in case any slip through from the API
-  const filteredProducts = Array.isArray(products) 
-    ? products.filter(product => !product.isDeleted)
+  const filteredProducts = Array.isArray(products)
+    ? products.filter((product) => !product.isDeleted)
     : [];
 
   const handleFilterChange = (newFilters) => {
@@ -48,7 +47,7 @@ const Products = () => {
       <Typography variant="h4" gutterBottom>
         Our Products
       </Typography>
-      
+
       <Grid container spacing={3}>
         <Grid item xs={12} md={3}>
           <ProductFilter
@@ -57,13 +56,20 @@ const Products = () => {
             categories={[]} // TODO: Add categories from API
           />
         </Grid>
-        
+
         <Grid item xs={12} md={9}>
-          <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <ProductSearch onSearch={handleSearch} />
+          <Box
+            sx={{
+              mb: 3,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            {/* <ProductSearch onSearch={handleSearch} /> */}
             <ProductSort sortBy={sortBy} onSortChange={handleSort} />
           </Box>
-          
+
           <ProductGrid
             products={filteredProducts}
             loading={loading}
@@ -76,4 +82,4 @@ const Products = () => {
   );
 };
 
-export default Products; 
+export default Products;

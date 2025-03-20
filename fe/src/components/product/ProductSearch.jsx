@@ -1,5 +1,5 @@
-import { Paper, InputBase, IconButton } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
+import SearchIcon from "@mui/icons-material/Search";
+import { IconButton, InputBase, Paper } from "@mui/material";
 
 const ProductSearch = ({ onSearch }) => {
   const handleSubmit = (event) => {
@@ -13,10 +13,10 @@ const ProductSearch = ({ onSearch }) => {
       component="form"
       onSubmit={handleSubmit}
       sx={{
-        p: '2px 4px',
-        display: 'flex',
-        alignItems: 'center',
-        width: '100%',
+        p: "2px 4px",
+        display: "flex",
+        alignItems: "center",
+        width: "100%",
         maxWidth: 400,
         mb: 2,
       }}
@@ -25,13 +25,13 @@ const ProductSearch = ({ onSearch }) => {
         sx={{ ml: 1, flex: 1 }}
         placeholder="Search products..."
         name="search"
-        inputProps={{ 'aria-label': 'search products' }}
+        inputProps={{ "aria-label": "search products" }}
       />
-      <IconButton type="submit" sx={{ p: '10px' }} aria-label="search">
+      <IconButton type="submit" sx={{ p: "10px" }} aria-label="search">
         <SearchIcon />
       </IconButton>
     </Paper>
   );
 };
 
-export default ProductSearch; 
+export default ProductSearch;

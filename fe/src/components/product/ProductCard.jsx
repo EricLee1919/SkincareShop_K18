@@ -1,42 +1,53 @@
+import { Favorite, FavoriteBorder, ShoppingCart } from "@mui/icons-material";
 import {
+  Box,
+  Button,
   Card,
   CardContent,
   CardMedia,
-  Typography,
-  Button,
-  Box,
-  Rating,
   IconButton,
+  Rating,
   Tooltip,
-} from '@mui/material';
-import { ShoppingCart, Favorite, FavoriteBorder } from '@mui/icons-material';
-import { useDispatch, useSelector } from 'react-redux';
-import { addToCart } from '../../store/slices/cartSlice';
-import { useState } from 'react';
+  Typography,
+} from "@mui/material";
+import numeral from "numeral";
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { addToCart } from "../../store/slices/cartSlice";
 
 const ProductCard = ({ product }) => {
   const dispatch = useDispatch();
   const [isFavorite, setIsFavorite] = useState(false);
+  const navigate = useNavigate();
   const { items } = useSelector((state) => state.cart);
   const isInCart = items.some((item) => item.id === product.id);
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (e) => {
+    e.stopPropagation();
     dispatch(addToCart(product));
   };
 
-  const handleToggleFavorite = () => {
+  const handleToggleFavorite = (e) => {
+    e.stopPropagation();
     setIsFavorite(!isFavorite);
+  };
+
+  const handleOnClick = () => {
+    navigate(`/products/${[product.id]}`);
   };
 
   return (
     <Card
+      onClick={handleOnClick}
+      style={{ cursor: "pointer" }}
       sx={{
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        transition: 'transform 0.2s',
-        '&:hover': {
-          transform: 'translateY(-4px)',
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        transition: "transform 0.2s",
+        "&:hover": {
+          transform: "translateY(-4px)",
           boxShadow: 3,
         },
       }}
@@ -46,7 +57,7 @@ const ProductCard = ({ product }) => {
         height="200"
         image={product.image}
         alt={product.name}
-        sx={{ objectFit: 'cover' }}
+        sx={{ objectFit: "cover" }}
       />
       <CardContent sx={{ flexGrow: 1 }}>
         <Typography gutterBottom variant="h6" component="h2" noWrap>
@@ -56,24 +67,29 @@ const ProductCard = ({ product }) => {
           variant="body2"
           color="text.secondary"
           sx={{
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            display: '-webkit-box',
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            display: "-webkit-box",
             WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
+            WebkitBoxOrient: "vertical",
             mb: 1,
           }}
         >
           {product.description}
         </Typography>
         <Box display="flex" alignItems="center" mb={1}>
-          <Rating value={product.rating} precision={0.5} readOnly size="small" />
+          <Rating
+            value={product.rating}
+            precision={0.5}
+            readOnly
+            size="small"
+          />
           <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
-            ({product.reviewCount})
+            ({product.ratings && product.ratings.length})
           </Typography>
         </Box>
         <Typography variant="h6" color="primary" gutterBottom>
-          ${product.price.toFixed(2)}
+          {numeral(product.price).format("0,0")} đ
         </Typography>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Button
@@ -83,9 +99,11 @@ const ProductCard = ({ product }) => {
             onClick={handleAddToCart}
             disabled={isInCart}
           >
-            {isInCart ? 'In Cart' : 'Add to Cart'}
+            {isInCart ? "In Cart" : "Add to Cart"}
           </Button>
-          <Tooltip title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}>
+          <Tooltip
+            title={isFavorite ? "Remove from favorites" : "Add to favorites"}
+          >
             <IconButton onClick={handleToggleFavorite} color="primary">
               {isFavorite ? <Favorite /> : <FavoriteBorder />}
             </IconButton>
@@ -96,4 +114,4 @@ const ProductCard = ({ product }) => {
   );
 };
 
-export default ProductCard; 
+export default ProductCard;
