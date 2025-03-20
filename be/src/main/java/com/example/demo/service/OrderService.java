@@ -38,7 +38,7 @@ public class OrderService {
 
     @Autowired
     AccountUtils accountUtils;
-    
+
     @Autowired
     MomoPaymentService momoPaymentService;
 
@@ -91,8 +91,8 @@ public class OrderService {
             } else {
                 // Fallback to default payment gateway
                 System.out.println("Using default payment method for order #" + newOrder.getId());
-                return createURLPayment(newOrder);
-            }
+        return createURLPayment(newOrder);
+    }
         } catch (Exception e) {
             // Log error and update order status
             System.err.println("Error creating payment: " + e.getMessage());
