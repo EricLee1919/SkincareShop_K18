@@ -23,11 +23,11 @@ function Register() {
     initialValues: {
       email: "",
       password: "",
-      name: "",
+      username: "",
     },
     onSubmit: async (values) => {
-      const { name, email, password } = values;
-      await registerWithEmailAndPassword(name, email, password);
+      const { username, email, password } = values;
+      await registerWithEmailAndPassword(username, email, password);
     },
     validationSchema: Yup.object().shape({
       name: Yup.string().required("Required"),
