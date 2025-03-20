@@ -1,39 +1,41 @@
+import { Favorite, FavoriteBorder, ShoppingCart } from "@mui/icons-material";
 import {
+  Box,
+  Button,
   Card,
   CardContent,
   CardMedia,
-  Typography,
-  Button,
-  Box,
-  Rating,
   IconButton,
+  Rating,
   Tooltip,
 } from "@mui/material";
 import { ShoppingCart, Favorite, FavoriteBorder } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../../store/slices/cartSlice";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 const ProductCard = ({ product }) => {
   const dispatch = useDispatch();
   const [isFavorite, setIsFavorite] = useState(false);
+  const navigate = useNavigate();
   const { items } = useSelector((state) => state.cart);
   const isInCart = items.some((item) => item.id === product.id);
   const navigate = useNavigate();
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (e) => {
+    e.stopPropagation();
     dispatch(addToCart(product));
   };
 
-  const handleToggleFavorite = () => {
+  const handleToggleFavorite = (e) => {
+    e.stopPropagation();
     setIsFavorite(!isFavorite);
   };
-  const handleProductClick = () => {
-    navigate(`/products/${product.id}`);
-  };
+
   return (
     <Card
+      onClick={handleOnClick}
+      style={{ cursor: "pointer" }}
       sx={{
         height: "100%",
         display: "flex",
@@ -79,11 +81,11 @@ const ProductCard = ({ product }) => {
             size="small"
           />
           <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
-            ({product.reviewCount})
+            ({product.ratings && product.ratings.length})
           </Typography>
         </Box>
         <Typography variant="h6" color="primary" gutterBottom>
-          ${product.price.toFixed(2)}
+          {numeral(product.price).format("0,0")} đ
         </Typography>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Button

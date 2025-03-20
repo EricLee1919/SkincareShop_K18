@@ -1,45 +1,47 @@
-import { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { 
-  Container, 
-  Typography, 
-  Paper, 
-  Divider, 
-  Box, 
-  Grid, 
-  Chip, 
+import {
+  Box,
   Button,
+  Chip,
+  Container,
+  Divider,
+  Grid,
+  Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
-  TableRow
-} from '@mui/material';
-import { Link } from 'react-router-dom';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
-import ErrorMessage from '../../components/common/ErrorMessage';
-import { fetchMyOrders } from '../../store/slices/orderSlice';
+  TableRow,
+  Typography,
+} from "@mui/material";
+import dayjs from "dayjs";
+import numeral from "numeral";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import ErrorMessage from "../../components/common/ErrorMessage";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
+import { fetchMyOrders } from "../../store/slices/orderSlice";
 
 // Helper function to format dates
 const formatDate = (dateString) => {
-  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  const options = { year: "numeric", month: "long", day: "numeric" };
   return new Date(dateString).toLocaleDateString(undefined, options);
 };
 
 // Helper function to get status color
 const getStatusColor = (status) => {
   switch (status.toLowerCase()) {
-    case 'processing':
-      return 'warning';
-    case 'shipped':
-      return 'info';
-    case 'delivered':
-      return 'success';
-    case 'cancelled':
-      return 'error';
+    case "processing":
+      return "warning";
+    case "shipped":
+      return "info";
+    case "delivered":
+      return "success";
+    case "cancelled":
+      return "error";
     default:
-      return 'default';
+      return "default";
   }
 };
 
@@ -57,7 +59,9 @@ const Orders = () => {
   }
 
   if (error) {
-    return <ErrorMessage message={error} onRetry={() => dispatch(fetchMyOrders())} />;
+    return (
+      <ErrorMessage message={error} onRetry={() => dispatch(fetchMyOrders())} />
+    );
   }
 
   return (
@@ -65,16 +69,16 @@ const Orders = () => {
       <Typography variant="h4" component="h1" gutterBottom>
         My Orders
       </Typography>
-      
+
       {orders && orders.length === 0 ? (
-        <Paper sx={{ p: 4, textAlign: 'center' }}>
+        <Paper sx={{ p: 4, textAlign: "center" }}>
           <Typography variant="h6" gutterBottom>
             You haven't placed any orders yet
           </Typography>
-          <Button 
-            component={Link} 
-            to="/products" 
-            variant="contained" 
+          <Button
+            component={Link}
+            to="/products"
+            variant="contained"
             color="primary"
             sx={{ mt: 2 }}
           >
@@ -95,54 +99,64 @@ const Orders = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {orders && orders.map((order) => (
-                  <TableRow 
-                    key={order.id}
-                    hover
-                    onClick={() => setSelectedOrder(order)}
-                    sx={{ cursor: 'pointer' }}
-                  >
-                    <TableCell>#{order.id}</TableCell>
-                    <TableCell>{formatDate(order.createdAt)}</TableCell>
-                    <TableCell>${order.totalAmount.toFixed(2)}</TableCell>
-                    <TableCell>
-                      <Chip 
-                        label={order.status} 
-                        color={getStatusColor(order.status)}
-                        size="small"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        size="small"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedOrder(order);
-                        }}
-                      >
-                        View Details
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {orders &&
+                  orders.map((order) => (
+                    <TableRow
+                      key={order.id}
+                      hover
+                      onClick={() => setSelectedOrder(order)}
+                      sx={{ cursor: "pointer" }}
+                    >
+                      <TableCell>#{order.id}</TableCell>
+                      <TableCell>{dayjs(order.createAt).fromNow()}</TableCell>
+                      <TableCell>
+                        đ{" "}
+                        {(order.total && numeral(order.total).format("0,0")) ||
+                          NaN}
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={order.status}
+                          color={getStatusColor(order.status)}
+                          size="small"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          size="small"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedOrder(order);
+                          }}
+                        >
+                          View Details
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
               </TableBody>
             </Table>
           </TableContainer>
 
           {selectedOrder && (
             <Paper sx={{ p: 3, mb: 3 }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h5">
-                  Order #{selectedOrder.id}
-                </Typography>
-                <Chip 
-                  label={selectedOrder.status} 
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  mb: 2,
+                }}
+              >
+                <Typography variant="h5">Order #{selectedOrder.id}</Typography>
+                <Chip
+                  label={selectedOrder.status}
                   color={getStatusColor(selectedOrder.status)}
                 />
               </Box>
-              
+
               <Divider sx={{ mb: 2 }} />
-              
+
               <Grid container spacing={2}>
                 <Grid item xs={12} md={6}>
                   <Typography variant="subtitle2" color="text.secondary">
@@ -161,11 +175,11 @@ const Orders = () => {
                   </Typography>
                 </Grid>
               </Grid>
-              
+
               <Typography variant="h6" sx={{ mt: 3, mb: 2 }}>
                 Ordered Items
               </Typography>
-              
+
               <TableContainer>
                 <Table size="small">
                   <TableHead>
@@ -177,30 +191,32 @@ const Orders = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {selectedOrder.orderItems && selectedOrder.orderItems.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell>{item.product.name}</TableCell>
-                        <TableCell>${item.price.toFixed(2)}</TableCell>
-                        <TableCell>{item.quantity}</TableCell>
-                        <TableCell align="right">
-                          ${(item.price * item.quantity).toFixed(2)}
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    {selectedOrder.orderDetails &&
+                      selectedOrder.orderDetails.map((item) => (
+                        <TableRow key={item.id}>
+                          <TableCell>{item.product.name}</TableCell>
+                          <TableCell>
+                            {numeral(item.price).format(",0")} đ
+                          </TableCell>
+                          <TableCell>{item.quantity}</TableCell>
+                          <TableCell align="right">
+                            {numeral(item.price * item.quantity).format(",0")} đ
+                          </TableCell>
+                        </TableRow>
+                      ))}
+
                     <TableRow>
-                      <TableCell colSpan={3} align="right" sx={{ fontWeight: 'bold' }}>
-                        Shipping
-                      </TableCell>
-                      <TableCell align="right">
-                        ${selectedOrder.shippingCost.toFixed(2)}
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell colSpan={3} align="right" sx={{ fontWeight: 'bold' }}>
+                      <TableCell
+                        colSpan={3}
+                        align="right"
+                        sx={{ fontWeight: "bold" }}
+                      >
                         Total
                       </TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 'bold' }}>
-                        ${selectedOrder.totalAmount.toFixed(2)}
+                      <TableCell align="right" sx={{ fontWeight: "bold" }}>
+                        {selectedOrder.total &&
+                          numeral(selectedOrder.total).format("0,0")}{" "}
+                        đ
                       </TableCell>
                     </TableRow>
                   </TableBody>
@@ -214,4 +230,4 @@ const Orders = () => {
   );
 };
 
-export default Orders; 
+export default Orders;

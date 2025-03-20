@@ -38,7 +38,7 @@ public class OrderService {
 
     @Autowired
     AccountUtils accountUtils;
-    
+
     @Autowired
     MomoPaymentService momoPaymentService;
 
@@ -57,14 +57,14 @@ public class OrderService {
             if(product.getQuantity() >= orderDetailRequest.getQuantity()) {
                 orderDetail.setProduct(product);
                 orderDetail.setQuantity(orderDetailRequest.getQuantity());
-                orderDetail.setPrice(product.getPrice() * orderDetailRequest.getQuantity());
+                orderDetail.setPrice(product.getPrice());
                 orderDetail.setOrder(order);
                 orderDetails.add(orderDetail);
 
                 product.setQuantity(product.getQuantity() - orderDetailRequest.getQuantity());
                 productRepository.save(product);
 
-                total += orderDetail.getPrice();
+                total += orderDetail.getPrice() * orderDetail.getQuantity();
             } else {
                 throw new RuntimeException("Quantity is not enough");
             }
@@ -91,8 +91,8 @@ public class OrderService {
             } else {
                 // Fallback to default payment gateway
                 System.out.println("Using default payment method for order #" + newOrder.getId());
-                return createURLPayment(newOrder);
-            }
+        return createURLPayment(newOrder);
+    }
         } catch (Exception e) {
             // Log error and update order status
             System.err.println("Error creating payment: " + e.getMessage());

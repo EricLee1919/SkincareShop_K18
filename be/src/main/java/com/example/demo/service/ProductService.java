@@ -51,6 +51,7 @@ public class ProductService {
         if (existingProduct.isPresent()) {
             Product product = existingProduct.get();
             modelMapper.map(productRequest, product);
+
             Category category = categoryRepository.findById(productRequest.getCategoryId())
                     .orElseThrow(() -> new RuntimeException("Category not found"));
             product.setCategory(category);

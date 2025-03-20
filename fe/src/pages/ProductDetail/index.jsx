@@ -1,14 +1,16 @@
+<<<<<<< HEAD
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
+=======
+import { Favorite, ShoppingCart } from "@mui/icons-material";
+>>>>>>> 59e7285f1b6cc0172d5ec90bf703a408cd228f80
 import {
-  Container,
-  Grid,
-  Typography,
   Box,
   Button,
-  Rating,
   Chip,
+  Container,
   Divider,
+<<<<<<< HEAD
 } from "@mui/material";
 import { ShoppingCart, Favorite } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
@@ -16,6 +18,20 @@ import { fetchProductById } from "../../store/slices/productSlice";
 import { addToCart } from "../../store/slices/cartSlice";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 import ErrorMessage from "../../components/common/ErrorMessage";
+=======
+  Grid,
+  Rating,
+  Typography,
+} from "@mui/material";
+import numeral from "numeral";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import ErrorMessage from "../../components/common/ErrorMessage";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
+import { addToCart } from "../../store/slices/cartSlice";
+import { fetchProductById } from "../../store/slices/productSlice";
+>>>>>>> 59e7285f1b6cc0172d5ec90bf703a408cd228f80
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -87,12 +103,12 @@ const ProductDetail = () => {
           </Box>
 
           <Typography variant="h5" color="primary" gutterBottom>
-            ${product.price.toFixed(2)}
+            {product.price && numeral(product.price).format("0,0")} đ
           </Typography>
 
           {product.category && (
             <Chip
-              label={product.category}
+              label={product.category.name}
               color="primary"
               variant="outlined"
               sx={{ mb: 2 }}
