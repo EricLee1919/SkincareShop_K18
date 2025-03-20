@@ -17,7 +17,7 @@ public class DemoApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(DemoApplication.class, args);
-		System.out.println("Hello Spring boot");
+		System.out.println("Hello Spring boot mung qua troi qua dat");
 	}
 
 	// Create a new RESTFULL API

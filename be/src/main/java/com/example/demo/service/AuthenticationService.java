@@ -73,7 +73,7 @@ public class AuthenticationService implements UserDetailsService {
                     )
             );
         }catch (Exception e){
-            throw new NullPointerException("Wrong uername or password");
+            throw new NullPointerException("Wrong username or password");
         }
          Account account = authenticationRepository.findByUsername(authenticationRequest.getUsername()).orElseThrow();
          String token = tokenService.generateToken(account);

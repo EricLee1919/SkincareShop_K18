@@ -38,9 +38,11 @@ public class OrderService {
 
     @Autowired
     AccountUtils accountUtils;
+    
+    @Autowired
+    MomoPaymentService momoPaymentService;
 
-    public String create(OrderRequest orderRequest) throws Exception{
-
+    public String create(OrderRequest orderRequest) throws Exception {
         float total = 0;
 
         List<OrderDetail> orderDetails = new ArrayList<>();
@@ -48,96 +50,148 @@ public class OrderService {
         order.setOrderDetails(orderDetails);
         order.setAccount(accountUtils.getCurrentAccount());
 
-        for(OrderDetailRequest orderDetailRequest: orderRequest.getDetails()){
-
+        for(OrderDetailRequest orderDetailRequest: orderRequest.getDetails()) {
             OrderDetail orderDetail = new OrderDetail();
             Product product = productRepository.findProductById(orderDetailRequest.getProductId());
 
-            if(product.getQuantity() >= orderDetailRequest.getQuantity()){
-
+            if(product.getQuantity() >= orderDetailRequest.getQuantity()) {
                 orderDetail.setProduct(product);
                 orderDetail.setQuantity(orderDetailRequest.getQuantity());
                 orderDetail.setPrice(product.getPrice() * orderDetailRequest.getQuantity());
                 orderDetail.setOrder(order);
                 orderDetails.add(orderDetail);
 
-
                 product.setQuantity(product.getQuantity() - orderDetailRequest.getQuantity());
                 productRepository.save(product);
 
                 total += orderDetail.getPrice();
-            }else {
-                throw new RuntimeException("quantity is not enough");
+            } else {
+                throw new RuntimeException("Quantity is not enough");
             }
         }
+        
         order.setTotal(total);
-        Order newOrder =  orderRepository.save(order);
-        return createURLPayment(newOrder);
+        // Save order first to get ID
+        Order newOrder = orderRepository.save(order);
+        
+        // Generate payment URL based on payment method
+        String paymentMethod = orderRequest.getPaymentMethod();
+        System.out.println("Creating order with payment method: " + paymentMethod);
+        
+        try {
+            if (paymentMethod != null && paymentMethod.equals("MOMO")) {
+                System.out.println("Generating MoMo payment URL for order #" + newOrder.getId());
+                String momoPaymentUrl = momoPaymentService.createPaymentRequest(newOrder, "Payment for order #" + newOrder.getId());
+                System.out.println("Generated MoMo payment URL: " + momoPaymentUrl);
+                return momoPaymentUrl;
+            } else if (paymentMethod != null && paymentMethod.equals("VNPAY")) {
+                // Using VNPay to process MB Bank transfer
+                System.out.println("Processing MB Bank transfer payment for order #" + newOrder.getId());
+                return createURLPayment(newOrder);
+            } else {
+                // Fallback to default payment gateway
+                System.out.println("Using default payment method for order #" + newOrder.getId());
+                return createURLPayment(newOrder);
+            }
+        } catch (Exception e) {
+            // Log error and update order status
+            System.err.println("Error creating payment: " + e.getMessage());
+            e.printStackTrace();
+            
+            // Update order status to indicate payment error
+            newOrder.setStatus(OrderStatus.IN_PROCESS);
+            orderRepository.save(newOrder);
+            
+            throw e; // Rethrow to let controller handle it
+        }
     }
 
-    public String createURLPayment(Order order) throws Exception{
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-        LocalDateTime createDate = LocalDateTime.now();
-        String formattedCreateDate = createDate.format(formatter);
-        String orderId = UUID.randomUUID().toString().substring(0, 6);
-
-        String tmnCode = "K2035S4C";
-        String secretKey = "6E93KTQ6EHNWFUIIIGJW3S9URPTN4MOU";
-        String vnpUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-        String returnURL = "http://localhost:5173/payment-result?orderId="+order.getId();
-
-        String currCode = "VND";
-        Map<String, String> vnpParams = new TreeMap<>();
-        vnpParams.put("vnp_Version", "2.1.0");
-        vnpParams.put("vnp_Command", "pay");
-        vnpParams.put("vnp_TmnCode", tmnCode);
-        vnpParams.put("vnp_Locale", "vn");
-        vnpParams.put("vnp_CurrCode", currCode);
-        vnpParams.put("vnp_TxnRef", orderId);
-        vnpParams.put("vnp_OrderInfo", "Thanh toan cho ma GD: " + orderId);
-        vnpParams.put("vnp_OrderType", "other");
-        vnpParams.put("vnp_Amount", (int) order.getTotal() + "00");
-        vnpParams.put("vnp_ReturnUrl", returnURL);
-        vnpParams.put("vnp_CreateDate", formattedCreateDate);
-        vnpParams.put("vnp_IpAddr", "167.99.74.201");
-
-        StringBuilder signDataBuilder = new StringBuilder();
-        for (Map.Entry<String, String> entry : vnpParams.entrySet()) {
-            signDataBuilder.append(URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8.toString()));
-            signDataBuilder.append("=");
-            signDataBuilder.append(URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8.toString()));
-            signDataBuilder.append("&");
+    public String createURLPayment(Order order) throws Exception {
+        String vnp_Version = "2.1.0";
+        String vnp_Command = "pay";
+        String vnp_TxnRef = String.valueOf(order.getId());
+        String vnp_IpAddr = "127.0.0.1";
+        String vnp_TmnCode = "K2035S4C";
+        String vnp_Locale = "vn";
+        String vnp_CurrCode = "VND";
+        String vnp_OrderType = "other";
+        String vnp_OrderInfo = "Payment for order #" + order.getId();
+        String vnp_SecretKey = "6E93KTQ6EHNWFUIIIGJW3S9URPTN4MOU";
+        String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
+        
+        // Force bank transfer/ATM form to be shown directly
+        String vnp_CardType = "ATM";
+        String vnp_BankCode = "MBBANK"; // Explicitly select MB Bank
+        
+        long amount = Math.round(order.getTotal() * 100);
+        
+        Map<String, String> vnp_Params = new HashMap<>();
+        vnp_Params.put("vnp_Version", vnp_Version);
+        vnp_Params.put("vnp_Command", vnp_Command);
+        vnp_Params.put("vnp_TmnCode", vnp_TmnCode);
+        vnp_Params.put("vnp_Amount", String.valueOf(amount));
+        vnp_Params.put("vnp_BankCode", vnp_BankCode);
+        vnp_Params.put("vnp_CardType", vnp_CardType);
+        vnp_Params.put("vnp_Payment_Type", vnp_CardType);
+        vnp_Params.put("vnp_CreateDate", getFormattedDateTime());
+        vnp_Params.put("vnp_CurrCode", vnp_CurrCode);
+        vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
+        vnp_Params.put("vnp_Locale", vnp_Locale);
+        vnp_Params.put("vnp_OrderInfo", vnp_OrderInfo);
+        vnp_Params.put("vnp_OrderType", vnp_OrderType);
+        vnp_Params.put("vnp_ReturnUrl", "http://localhost:5173/payment-result?orderId="+order.getId());
+        vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
+        
+        // Add merchant information for better visibility
+        vnp_Params.put("vnp_Merchant", "SkinCare Shop K18");
+        
+        List<String> fieldNames = new ArrayList<>(vnp_Params.keySet());
+        Collections.sort(fieldNames);
+        
+        StringBuilder hashData = new StringBuilder();
+        StringBuilder query = new StringBuilder();
+        
+        Iterator<String> itr = fieldNames.iterator();
+        while (itr.hasNext()) {
+            String fieldName = itr.next();
+            String fieldValue = vnp_Params.get(fieldName);
+            if ((fieldValue != null) && (fieldValue.length() > 0)) {
+                hashData.append(fieldName);
+                hashData.append('=');
+                hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+                query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString()));
+                query.append('=');
+                query.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+                if (itr.hasNext()) {
+                    query.append('&');
+                    hashData.append('&');
+                }
+            }
         }
-        signDataBuilder.deleteCharAt(signDataBuilder.length() - 1); // Remove last '&'
-
-        String signData = signDataBuilder.toString();
-        String signed = generateHMAC(secretKey, signData);
-
-        vnpParams.put("vnp_SecureHash", signed);
-
-        StringBuilder urlBuilder = new StringBuilder(vnpUrl);
-        urlBuilder.append("?");
-        for (Map.Entry<String, String> entry : vnpParams.entrySet()) {
-            urlBuilder.append(URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8.toString()));
-            urlBuilder.append("=");
-            urlBuilder.append(URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8.toString()));
-            urlBuilder.append("&");
-        }
-        urlBuilder.deleteCharAt(urlBuilder.length() - 1); // Remove last '&'
-        return urlBuilder.toString();
+        
+        String queryUrl = query.toString();
+        String vnp_SecureHash = hmacSHA512(vnp_SecretKey, hashData.toString());
+        queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
+        String paymentUrl = vnp_PayUrl + "?" + queryUrl;
+        
+        System.out.println("Created VNPay bank transfer URL: " + paymentUrl);
+        return paymentUrl;
     }
-
-    private String generateHMAC(String secretKey, String signData) throws NoSuchAlgorithmException, InvalidKeyException {
-        Mac hmacSha512 = Mac.getInstance("HmacSHA512");
-        SecretKeySpec keySpec = new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8), "HmacSHA512");
-        hmacSha512.init(keySpec);
-        byte[] hmacBytes = hmacSha512.doFinal(signData.getBytes(StandardCharsets.UTF_8));
-
-        StringBuilder result = new StringBuilder();
-        for (byte b : hmacBytes) {
-            result.append(String.format("%02x", b));
+    
+    private String hmacSHA512(String key, String data) throws Exception {
+        Mac sha512Hmac = Mac.getInstance("HmacSHA512");
+        SecretKeySpec secretKeySpec = new SecretKeySpec(key.getBytes(), "HmacSHA512");
+        sha512Hmac.init(secretKeySpec);
+        byte[] hmacData = sha512Hmac.doFinal(data.getBytes());
+        return bytesToHex(hmacData);
+    }
+    
+    private String bytesToHex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) {
+            sb.append(String.format("%02x", b));
         }
-        return result.toString();
+        return sb.toString();
     }
 
     public Order updateStatus(OrderStatus orderStatus, long id){
@@ -153,5 +207,10 @@ public class OrderService {
 
     public List<Order> getAll() {
         return orderRepository.findAll();
+    }
+
+    private String getFormattedDateTime() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+        return LocalDateTime.now().format(formatter);
     }
 }
