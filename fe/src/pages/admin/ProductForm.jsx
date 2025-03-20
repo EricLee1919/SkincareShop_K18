@@ -166,10 +166,7 @@ const ProductForm = () => {
       const productData = {
         ...values,
         id: isEditMode ? Number(id) : 0,
-        isDeleted: values.isDeleted || false,
       };
-      
-      console.log('Sending product data to API:', productData);
       
       // Make API call
       const response = await fetch(
@@ -393,11 +390,7 @@ const ProductForm = () => {
                             id="isDeleted"
                             name="isDeleted"
                             checked={values.isDeleted}
-                            onChange={(e) => {
-                              const isDeleted = e.target.checked;
-                              setFieldValue('isDeleted', isDeleted);
-                              console.log('isDeleted set to:', isDeleted);
-                            }}
+                            onChange={handleChange}
                             color="primary"
                           />
                         }
