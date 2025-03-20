@@ -25,6 +25,7 @@ import AdminDashboard from './pages/Admin/Dashboard';
 import AdminProducts from './pages/Admin/Products';
 import ProductForm from './pages/Admin/ProductForm';
 import Categories from './pages/Admin/Categories';
+import AdminOrders from './pages/admin/Orders';
 
 // Create theme
 const theme = createTheme({
@@ -182,11 +183,6 @@ const App = () => {
               <Layout><Orders /></Layout>
             </ProtectedRoute>
           } />
-          <Route path="/payment/result" element={
-            <ProtectedRoute>
-              <Layout><PaymentResult /></Layout>
-            </ProtectedRoute>
-          } />
           <Route path="/payment-result" element={
             <ProtectedRoute>
               <Layout><PaymentResult /></Layout>
@@ -222,6 +218,11 @@ const App = () => {
           <Route path="/admin/categories" element={
             <AdminRoute>
               <AdminLayout><Categories /></AdminLayout>
+            </AdminRoute>
+          } />
+          <Route path="/admin/orders" element={
+            <AdminRoute>
+              <AdminLayout><AdminOrders /></AdminLayout>
             </AdminRoute>
           } />
           

@@ -8,11 +8,13 @@ import {
   IconButton,
   Rating,
   Tooltip,
+  Typography
 } from "@mui/material";
-import { ShoppingCart, Favorite, FavoriteBorder } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../../store/slices/cartSlice";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import numeral from "numeral";
 
 const ProductCard = ({ product }) => {
   const dispatch = useDispatch();
@@ -20,7 +22,6 @@ const ProductCard = ({ product }) => {
   const navigate = useNavigate();
   const { items } = useSelector((state) => state.cart);
   const isInCart = items.some((item) => item.id === product.id);
-  const navigate = useNavigate();
 
   const handleAddToCart = (e) => {
     e.stopPropagation();
@@ -32,9 +33,13 @@ const ProductCard = ({ product }) => {
     setIsFavorite(!isFavorite);
   };
 
+  const handleProductClick = () => {
+    navigate(`/product/${product.id}`);
+  };
+
   return (
     <Card
-      onClick={handleOnClick}
+      onClick={handleProductClick}
       style={{ cursor: "pointer" }}
       sx={{
         height: "100%",
@@ -46,7 +51,6 @@ const ProductCard = ({ product }) => {
           boxShadow: 3,
         },
       }}
-      onClick={handleProductClick}
     >
       <CardMedia
         component="img"

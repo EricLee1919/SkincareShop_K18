@@ -49,11 +49,22 @@ public class Filter extends OncePerRequestFilter {
         String uri = request.getRequestURI();
         String method = request.getMethod();
 
+        System.out.println("Filter checking URI: " + uri + ", Method: " + method);
+
         if(method.equals("GET") && patchMatch.match("/api/product/**", uri)){
+            System.out.println("Allowing GET product request");
             return true; // public api
         }
 
-        return PUBLIC_API.stream().anyMatch(item -> patchMatch.match(item, uri));
+        // Temporarily allow all orders API requests for debugging
+        if(method.equals("GET") && patchMatch.match("/api/orders/**", uri)){
+            System.out.println("Allowing GET orders request for debugging");
+            return true;
+        }
+
+        boolean isPublic = PUBLIC_API.stream().anyMatch(item -> patchMatch.match(item, uri));
+        System.out.println("Is public API: " + isPublic);
+        return isPublic;
     }
 
     @Override
@@ -63,8 +74,10 @@ public class Filter extends OncePerRequestFilter {
         // check trước khi cho truy cập
 
         String uri = request.getRequestURI();
+        System.out.println("Processing request: " + uri);
         if(isPermitted(request)){
             // public API
+            System.out.println("Request is permitted, allowing access");
             filterChain.doFilter(request,response);
         }else{
             // không phải là public API => check role
@@ -72,6 +85,7 @@ public class Filter extends OncePerRequestFilter {
 
             if(token == null){
                 // chưa đăng nhập => quăng lỗi
+                System.out.println("Token is missing, denying access");
                 resolver.resolveException(request, response, null, new AuthorizeException("Authentication token is missing!"));
             }
 

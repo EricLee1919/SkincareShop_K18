@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class PaymentResponse {
-    String paymentUrl;
-    String orderId;
+    private String paymentUrl;
+    private String orderId;
 }

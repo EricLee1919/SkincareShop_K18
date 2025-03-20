@@ -17,6 +17,7 @@
     "@mui/x-data-grid": "^6.19.4",
     "@reduxjs/toolkit": "^2.1.0",
     "axios": "^1.6.7",
+    "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
     "formik": "^2.4.5",
     "numeral": "^2.0.6",

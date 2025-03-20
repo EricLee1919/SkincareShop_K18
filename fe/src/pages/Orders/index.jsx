@@ -49,26 +49,60 @@ const Orders = () => {
   const dispatch = useDispatch();
   const { orders, loading, error } = useSelector((state) => state.orders);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    dispatch(fetchMyOrders());
-  }, [dispatch]);
+    // Only fetch orders if initial load is not complete or we're explicitly refreshing
+    if (!initialLoadComplete || refreshing) {
+      console.log("Fetching customer orders...");
+      dispatch(fetchMyOrders())
+        .then(() => {
+          setInitialLoadComplete(true);
+          if (refreshing) setRefreshing(false);
+          console.log("Customer orders fetched successfully");
+        })
+        .catch((err) => {
+          console.error("Error fetching customer orders:", err);
+          setInitialLoadComplete(true);
+          if (refreshing) setRefreshing(false);
+        });
+    }
+  }, [dispatch, initialLoadComplete, refreshing]);
 
-  if (loading) {
+  const handleRefresh = () => {
+    setRefreshing(true);
+  };
+
+  if (loading && !initialLoadComplete) {
     return <LoadingSpinner message="Loading your orders..." />;
   }
 
   if (error) {
     return (
-      <ErrorMessage message={error} onRetry={() => dispatch(fetchMyOrders())} />
+      <ErrorMessage 
+        message={error} 
+        onRetry={() => {
+          setRefreshing(true);
+        }} 
+      />
     );
   }
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        My Orders
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Typography variant="h4" component="h1">
+          My Orders
+        </Typography>
+        <Button 
+          variant="outlined" 
+          onClick={handleRefresh}
+          disabled={loading}
+        >
+          {loading ? "Refreshing..." : "Refresh"}
+        </Button>
+      </Box>
 
       {orders && orders.length === 0 ? (
         <Paper sx={{ p: 4, textAlign: "center" }}>

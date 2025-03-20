@@ -6,7 +6,9 @@ import com.example.demo.entity.OrderDetail;
 import com.example.demo.entity.Product;
 import com.example.demo.entity.request.OrderDetailRequest;
 import com.example.demo.entity.request.OrderRequest;
+import com.example.demo.entity.response.PaymentResponse;
 import com.example.demo.enums.OrderStatus;
+import com.example.demo.enums.PaymentMethod;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.ProductRepository;
 import com.example.demo.utils.AccountUtils;
@@ -42,13 +44,26 @@ public class OrderService {
     @Autowired
     MomoPaymentService momoPaymentService;
 
-    public String create(OrderRequest orderRequest) throws Exception {
+    public PaymentResponse create(OrderRequest orderRequest) throws Exception {
         float total = 0;
 
         List<OrderDetail> orderDetails = new ArrayList<>();
         Order order = modelMapper.map(orderRequest, Order.class);
         order.setOrderDetails(orderDetails);
         order.setAccount(accountUtils.getCurrentAccount());
+
+        // Set payment method from request
+        String paymentMethodStr = orderRequest.getPaymentMethod();
+        if (paymentMethodStr != null) {
+            try {
+                PaymentMethod paymentMethod = PaymentMethod.valueOf(paymentMethodStr);
+                order.setPaymentMethod(paymentMethod);
+            } catch (IllegalArgumentException e) {
+                System.err.println("Invalid payment method: " + paymentMethodStr);
+                // Default to BANK_TRANSFER if invalid
+                order.setPaymentMethod(PaymentMethod.BANK_TRANSFER);
+            }
+        }
 
         for(OrderDetailRequest orderDetailRequest: orderRequest.getDetails()) {
             OrderDetail orderDetail = new OrderDetail();
@@ -74,25 +89,35 @@ public class OrderService {
         // Save order first to get ID
         Order newOrder = orderRepository.save(order);
         
+        PaymentResponse response = new PaymentResponse();
+        response.setOrderId(String.valueOf(newOrder.getId()));
+        
         // Generate payment URL based on payment method
         String paymentMethod = orderRequest.getPaymentMethod();
         System.out.println("Creating order with payment method: " + paymentMethod);
         
         try {
+            String paymentUrl = null;
             if (paymentMethod != null && paymentMethod.equals("MOMO")) {
                 System.out.println("Generating MoMo payment URL for order #" + newOrder.getId());
-                String momoPaymentUrl = momoPaymentService.createPaymentRequest(newOrder, "Payment for order #" + newOrder.getId());
-                System.out.println("Generated MoMo payment URL: " + momoPaymentUrl);
-                return momoPaymentUrl;
+                paymentUrl = momoPaymentService.createPaymentRequest(newOrder, "Payment for order #" + newOrder.getId());
+                System.out.println("Generated MoMo payment URL: " + paymentUrl);
             } else if (paymentMethod != null && paymentMethod.equals("VNPAY")) {
                 // Using VNPay to process MB Bank transfer
                 System.out.println("Processing MB Bank transfer payment for order #" + newOrder.getId());
-                return createURLPayment(newOrder);
+                paymentUrl = createURLPayment(newOrder);
+            } else if (paymentMethod != null && paymentMethod.equals("BANK_TRANSFER")) {
+                // For bank transfer, return the payment result URL directly
+                paymentUrl = "http://localhost:5173/payment-result?orderId=" + newOrder.getId() + "&method=bank_transfer";
             } else {
                 // Fallback to default payment gateway
                 System.out.println("Using default payment method for order #" + newOrder.getId());
-        return createURLPayment(newOrder);
-    }
+                paymentUrl = createURLPayment(newOrder);
+            }
+            
+            response.setPaymentUrl(paymentUrl);
+            return response;
+            
         } catch (Exception e) {
             // Log error and update order status
             System.err.println("Error creating payment: " + e.getMessage());
@@ -207,6 +232,10 @@ public class OrderService {
 
     public List<Order> getAll() {
         return orderRepository.findAll();
+    }
+
+    public Order getOrderById(long id) {
+        return orderRepository.findOrderById(id);
     }
 
     private String getFormattedDateTime() {

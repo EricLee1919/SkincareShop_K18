@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -23,14 +22,21 @@ public class OrderAPI {
 
     @PostMapping(path = "/create")
     public ResponseEntity<PaymentResponse> create(@RequestBody OrderRequest orderRequest) throws Exception {
-
-        PaymentResponse response = new PaymentResponse();
-        UUID orderId = UUID.randomUUID();
-        String urlPayment = orderService.create(orderRequest);
-
-        response.setPaymentUrl(urlPayment);
-        response.setOrderId(orderId.toString());
-
+        // Create order and get the payment response
+        PaymentResponse response = orderService.create(orderRequest);
+        
+        // Ensure the payment response has a valid order ID
+        if (response.getOrderId() == null || response.getOrderId().isEmpty()) {
+            // Get the latest order for this user to get its ID
+            List<Order> userOrders = orderService.getOrdersByUser();
+            if (!userOrders.isEmpty()) {
+                Order latestOrder = userOrders.get(userOrders.size() - 1);
+                response.setOrderId(String.valueOf(latestOrder.getId()));
+            } else {
+                throw new RuntimeException("Failed to create order");
+            }
+        }
+        
         return ResponseEntity.ok(response);
     }
 
@@ -42,7 +48,9 @@ public class OrderAPI {
 
     @GetMapping
     public ResponseEntity getAll() {
+        System.out.println("OrderAPI: getAll method called");
         List<Order> orders = orderService.getAll();
+        System.out.println("OrderAPI: Found " + orders.size() + " orders");
         return ResponseEntity.ok(orders);
     }
 
@@ -50,5 +58,14 @@ public class OrderAPI {
     public ResponseEntity<List<Order>> getOrdersByUser() {
         List<Order> orders = orderService.getOrdersByUser();
         return ResponseEntity.ok(orders);
+    }
+    
+    @GetMapping("/{id}")
+    public ResponseEntity<Order> getOrderById(@PathVariable long id) {
+        Order order = orderService.getOrderById(id);
+        if (order == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(order);
     }
 }

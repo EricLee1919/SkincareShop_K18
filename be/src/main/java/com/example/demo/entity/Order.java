@@ -1,6 +1,7 @@
 package com.example.demo.entity;
 
 import com.example.demo.enums.OrderStatus;
+import com.example.demo.enums.PaymentMethod;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.firebase.database.core.Repo;
 import jakarta.persistence.*;
@@ -25,6 +26,11 @@ public class Order {
     public Date createAt;
     public float total;
     public OrderStatus status = OrderStatus.IN_PROCESS;
+    
+    public String shippingAddress;
+    
+    @Enumerated(EnumType.STRING)
+    public PaymentMethod paymentMethod;
 
     @ManyToOne
     @JoinColumn(name = "account_id")

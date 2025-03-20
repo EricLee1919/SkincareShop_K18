@@ -129,16 +129,19 @@ const Checkout = () => {
     setError(null);
     
     try {
+      // Format shipping address
+      const formattedAddress = `${shippingData.address}, ${shippingData.city}, ${shippingData.state} ${shippingData.zipCode}`;
+      
       // Combine shipping and payment data
       const orderData = {
-        ...shippingData,
-        paymentMethod: paymentData.paymentMethod,
         details: cartItems.map(item => ({
           productId: item.id,
           productName: item.name,
           price: item.price,
           quantity: item.quantity
-        }))
+        })),
+        paymentMethod: paymentData.paymentMethod,
+        shippingAddress: formattedAddress
       };
       
       console.log('Submitting order:', orderData);
@@ -173,13 +176,17 @@ const Checkout = () => {
           throw new Error('Payment URL not provided for MoMo payment');
         }
       } else if (paymentData.paymentMethod === 'VNPAY') {
-        // For bank transfer, go to order summary page first
-        console.log('Navigating to order summary for bank transfer details');
+        // For VNPay, go to order summary page first
+        console.log('Navigating to order summary for VNPay payment details');
         // Store the payment URL in case we need it later
         if (paymentUrl) {
           sessionStorage.setItem('vnpayUrl', paymentUrl);
         }
         navigate(`/order-summary?orderId=${orderId}`);
+      } else if (paymentData.paymentMethod === 'BANK_TRANSFER') {
+        // For bank transfer, navigate to payment result with bank transfer information
+        console.log('Navigating to payment result for bank transfer');
+        navigate(`/payment-result?orderId=${orderId}&method=bank_transfer`);
       } else {
         // For credit card, clear cart and go to orders page
         dispatch(clearCart());
@@ -188,8 +195,9 @@ const Checkout = () => {
         });
       }
       
-      // Only clear cart for non-VNPay payments (we'll clear cart after bank transfer is confirmed)
-      if (paymentData.paymentMethod !== 'VNPAY') {
+      // Only clear cart for credit card payments
+      // (we'll clear cart after bank transfer/MoMo/VNPay is confirmed)
+      if (paymentData.paymentMethod === 'CREDIT_CARD') {
         dispatch(clearCart());
       }
       
@@ -331,128 +339,55 @@ const Checkout = () => {
       validationSchema={paymentSchema}
       onSubmit={handlePaymentSubmit}
     >
-      {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting, setFieldValue }) => (
+      {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting }) => (
         <Form onSubmit={handleSubmit}>
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <FormControl component="fieldset" fullWidth>
-                <FormLabel component="legend" sx={{ fontSize: '1.1rem', fontWeight: 'bold', mb: 2 }}>
-                  Select Payment Method
-                </FormLabel>
+          <FormControl component="fieldset" sx={{ mb: 3 }}>
+            <FormLabel component="legend">Payment Method</FormLabel>
                 <RadioGroup
                   name="paymentMethod"
                   value={values.paymentMethod}
-                  onChange={(e) => {
-                    console.log('Payment method changed to:', e.target.value);
-                    setFieldValue('paymentMethod', e.target.value);
-                  }}
-                >
-                  <Paper 
-                    elevation={values.paymentMethod === 'VNPAY' ? 3 : 1} 
-                    sx={{ 
-                      p: 2, 
-                      mb: 2, 
-                      border: values.paymentMethod === 'VNPAY' ? '2px solid #673ab7' : '1px solid #e0e0e0',
-                      borderRadius: 2,
-                      transition: 'all 0.3s ease'
-                    }}
+              onChange={handleChange}
                   >
                     <FormControlLabel 
-                      value="VNPAY" 
+                value="BANK_TRANSFER"
                       control={<Radio />} 
-                      label={
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                          <Typography sx={{ mr: 1 }}>Bank Transfer (MB Bank)</Typography>
-                          <img src="https://cdn.haitrieu.com/wp-content/uploads/2022/02/Logo-MB-Bank.png" alt="MB Bank" height="24" />
-                        </Box>
-                      }
-                      sx={{ width: '100%' }}
-                    />
-                    {values.paymentMethod === 'VNPAY' && (
-                      <Box sx={{ ml: 4, mt: 1, p: 2, bgcolor: '#f5f5f5', borderRadius: 1 }}>
-                        <Typography variant="subtitle2" fontWeight="medium" color="primary.dark" sx={{ mb: 1 }}>
-                          Payment Instructions:
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          When you proceed, you'll be directed to our bank transfer page where you can complete your payment to:
-                        </Typography>
-                        <Box sx={{ mt: 1, mb: 1, p: 1, bgcolor: 'white', borderRadius: 1, border: '1px solid #e0e0e0' }}>
-                          <Typography variant="body2"><strong>Bank:</strong> MB Bank</Typography>
-                          <Typography variant="body2"><strong>Account Number:</strong> 0838500046</Typography>
-                          <Typography variant="body2"><strong>Account Holder:</strong> SkinCare Shop K18</Typography>
-                          <Typography variant="body2"><strong>Amount:</strong> ${cartTotal.toFixed(2)}</Typography>
-                          <Typography variant="body2"><strong>Description:</strong> Payment for order #{new Date().getTime().toString().slice(-6)}</Typography>
-                        </Box>
-                        <Alert severity="info" sx={{ mt: 1 }}>
-                          For testing purposes, you can use any ATM card or account number in the sandbox environment.
-                        </Alert>
-                      </Box>
-                    )}
-                  </Paper>
-                  
-                  <Paper 
-                    elevation={values.paymentMethod === 'MOMO' ? 3 : 1} 
-                    sx={{ 
-                      p: 2, 
-                      mb: 2, 
-                      border: values.paymentMethod === 'MOMO' ? '2px solid #d82d8b' : '1px solid #e0e0e0',
-                      borderRadius: 2,
-                      transition: 'all 0.3s ease'
-                    }}
-                  >
+                label="Bank Transfer (MB Bank)"
+              />
                     <FormControlLabel 
                       value="MOMO" 
                       control={<Radio />} 
-                      label={
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                          <Typography variant="subtitle1" fontWeight="bold">
-                            MoMo e-Wallet
-                          </Typography>
-                          <Box 
-                            sx={{ 
-                              ml: 2, 
-                              bgcolor: '#d82d8b', 
-                              width: 24, 
-                              height: 24, 
-                              borderRadius: '50%', 
-                              display: 'flex', 
-                              alignItems: 'center', 
-                              justifyContent: 'center'
-                            }}
-                          >
-                            <Typography variant="caption" color="white" fontWeight="bold">M</Typography>
-                          </Box>
-                        </Box>
-                      }
-                      sx={{ width: '100%' }}
-                    />
-                  </Paper>
-                  
-                  <Paper 
-                    elevation={values.paymentMethod === 'CREDIT_CARD' ? 3 : 1} 
-                    sx={{ 
-                      p: 2, 
-                      border: values.paymentMethod === 'CREDIT_CARD' ? '2px solid #2196f3' : '1px solid #e0e0e0',
-                      borderRadius: 2,
-                      transition: 'all 0.3s ease'
-                    }}
-                  >
+                label="MoMo e-Wallet" 
+              />
                     <FormControlLabel 
-                      value="CREDIT_CARD" 
+                value="VNPAY" 
                       control={<Radio />} 
-                      label={
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                          <Typography variant="subtitle1" fontWeight="bold">
-                            Credit Card
-                          </Typography>
-                        </Box>
-                      }
-                      sx={{ width: '100%' }}
-                    />
-                  </Paper>
+                label="VNPay (Credit/Debit Card)" 
+              />
                 </RadioGroup>
               </FormControl>
-            </Grid>
+          
+          {values.paymentMethod === 'BANK_TRANSFER' && (
+            <Box sx={{ mb: 3, p: 2, bgcolor: "#f8f9fa", borderRadius: 1 }}>
+              <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'medium' }}>
+                Bank Transfer Information:
+              </Typography>
+              <Typography variant="body2" paragraph>
+                • Bank: MB Bank (Military Commercial Joint Stock Bank)
+              </Typography>
+              <Typography variant="body2" paragraph>
+                • Account Number: 0838500046
+              </Typography>
+              <Typography variant="body2" paragraph>
+                • Account Holder: TRUONG DINH LONG
+              </Typography>
+              <Typography variant="body2" paragraph>
+                • Amount: {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(cartTotal)}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                After completing your order, you'll be shown a QR code for easy bank transfer. Please include your order number in the transfer description.
+              </Typography>
+            </Box>
+          )}
 
             {values.paymentMethod === 'CREDIT_CARD' && (
               <>
@@ -597,7 +532,6 @@ const Checkout = () => {
               >
                 Continue to Review
               </Button>
-            </Grid>
           </Grid>
         </Form>
       )}

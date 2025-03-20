@@ -38,12 +38,42 @@ export const fetchMyOrders = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('fetchMyOrders: No token found in localStorage');
+        return rejectWithValue({ error: 'Authentication required' });
+      }
+      
+      console.log('fetchMyOrders: Sending request with token available');
+      
       const response = await axios.get(`${API_URL}/orders/my-orders`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      
+      console.log(`fetchMyOrders: Successfully fetched ${response.data.length} orders`);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || { error: 'Failed to fetch orders' });
+      console.error('fetchMyOrders error:', error);
+      console.error('Error details:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        message: error.message,
+        data: error.response?.data
+      });
+      
+      // Add specific error messages based on status codes
+      let errorMessage = 'Failed to fetch orders';
+      if (error.response?.status === 401) {
+        errorMessage = 'Your session has expired. Please login again.';
+      } else if (error.response?.status === 403) {
+        errorMessage = 'You do not have permission to access these orders.';
+      } else if (error.response?.status === 400) {
+        errorMessage = 'Invalid request when fetching orders. Please try again later.';
+      }
+      
+      return rejectWithValue({ 
+        error: errorMessage,
+        details: error.response?.data || error.message 
+      });
     }
   }
 );
@@ -155,7 +185,9 @@ const orderSlice = createSlice({
       })
       .addCase(fetchMyOrders.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload?.message || 'Failed to fetch your orders';
+        // Handle new error format with error and details properties
+        state.error = action.payload?.error || action.payload?.message || 'Failed to fetch your orders';
+        console.error('Order fetch error:', action.payload?.details || action.payload);
       })
       // Fetch Order by ID
       .addCase(fetchOrderById.pending, (state) => {

@@ -2,11 +2,13 @@ package com.example.demo.api;
 
 import com.example.demo.entity.Order;
 import com.example.demo.enums.OrderStatus;
+import com.example.demo.enums.PaymentMethod;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.service.MomoPaymentService;
 import com.example.demo.service.OrderService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -208,4 +210,60 @@ public class PaymentAPI {
      * 
      * Note: In production, additional security verification steps would be required
      */
+     
+    @PostMapping("/bank-transfer/confirm/{orderId}")
+    public ResponseEntity<Map<String, Object>> confirmBankTransfer(@PathVariable Long orderId) {
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            System.out.println("Received bank transfer confirmation for order ID: " + orderId);
+            
+            // Find the order
+            Order order = orderRepository.findOrderById(orderId);
+            
+            if (order == null) {
+                System.out.println("Order not found: " + orderId);
+                response.put("success", false);
+                response.put("message", "Order not found");
+                return ResponseEntity.ok(response);
+            }
+            
+            // Set payment method to BANK_TRANSFER if not already set
+            if (order.getPaymentMethod() == null) {
+                order.setPaymentMethod(PaymentMethod.BANK_TRANSFER);
+            }
+            
+            // Update order status to PENDING_PAYMENT
+            System.out.println("Updating order status to PENDING_PAYMENT for order ID: " + orderId);
+            orderService.updateStatus(OrderStatus.PENDING_PAYMENT, order.getId());
+            
+            response.put("success", true);
+            response.put("message", "Bank transfer confirmation received");
+            response.put("orderStatus", "PENDING_PAYMENT");
+            response.put("paymentMethod", order.getPaymentMethod().toString());
+            response.put("order", order);
+            response.put("verificationNote", "Your order will be processed once payment is verified by our team");
+            
+            // Add payment details for admin reference
+            Map<String, String> paymentDetails = new HashMap<>();
+            paymentDetails.put("bankName", "MB Bank");
+            paymentDetails.put("accountNumber", "0838500046");
+            paymentDetails.put("accountHolder", "SkinCare Shop K18");
+            paymentDetails.put("amount", String.valueOf(order.getTotal()));
+            paymentDetails.put("referenceNumber", "ORDER-" + order.getId());
+            
+            response.put("paymentDetails", paymentDetails);
+            
+            System.out.println("Bank transfer confirmation successful for order ID: " + orderId);
+            
+            // Let the global CORS config handle this - don't add duplicate headers
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Error processing bank transfer confirmation: " + e.getMessage());
+            response.put("success", false);
+            response.put("message", "Error processing bank transfer confirmation: " + e.getMessage());
+            return ResponseEntity.ok(response);
+        }
+    }
 } 
