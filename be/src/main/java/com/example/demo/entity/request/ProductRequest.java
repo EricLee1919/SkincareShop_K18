@@ -1,10 +1,15 @@
 package com.example.demo.entity.request;
 
 import com.example.demo.entity.Category;
+import com.example.demo.enums.RoutineStep;
+import com.example.demo.enums.SuitableType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
+
 public class ProductRequest {
     public long id = 0;
 
@@ -75,4 +80,7 @@ public class ProductRequest {
     public void setCategoryId(long categoryId) {
         this.categoryId = categoryId;
     }
+
+    private List<SuitableType> suitableTypes;
+    private RoutineStep routineStep;
 }

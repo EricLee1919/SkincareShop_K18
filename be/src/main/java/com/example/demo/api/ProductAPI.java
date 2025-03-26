@@ -2,6 +2,8 @@ package com.example.demo.api;
 
 import com.example.demo.entity.Product;
 import com.example.demo.entity.request.ProductRequest;
+import com.example.demo.enums.RoutineStep;
+import com.example.demo.enums.SuitableType;
 import com.example.demo.service.ProductService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -21,8 +23,14 @@ public class ProductAPI {
 
     // GET all products
     @GetMapping
-    public ResponseEntity<List<Product>> getAllProducts() {
-        return ResponseEntity.ok(productService.getAllProducts());
+    public ResponseEntity<List<Product>> getAllProducts(
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false) List<SuitableType> suitableTypes,
+            @RequestParam(required = false) RoutineStep routineStep) { // Added routineStep filter
+        return ResponseEntity.ok(productService.getAllProducts(categoryId, name, minPrice, maxPrice, suitableTypes, routineStep));
     }
 
     // GET product by ID
