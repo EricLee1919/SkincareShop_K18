@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import Layout from "./components/layout/Layout";
 import AdminLayout from "./components/layout/AdminLayout";
 import { Toaster } from "react-hot-toast";
-
+import ForgotPassword from "./pages/ForgotPassword";
 // Pages
 import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
@@ -197,6 +197,14 @@ const App = () => {
             element={
               <Layout>
                 <Login />
+              </Layout>
+            }
+          />
+          <Route
+            path="/forgot-password"
+            element={
+              <Layout>
+                <ForgotPassword />
               </Layout>
             }
           />
