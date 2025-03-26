@@ -47,6 +47,14 @@ public class Product {
     @JsonIgnore
     List<OrderDetail> orderDetails = new ArrayList<>();
 
+    @ElementCollection
+    @CollectionTable(name = "product_suitable_types", joinColumns = @JoinColumn(name = "product_id"))
+    @Enumerated(EnumType.STRING)  // Store as a string in the database
+    @Column(name = "suitable_type")
+    private List<SuitableType> suitableTypes;
+
+    @Enumerated(EnumType.STRING)
+    private RoutineStep routineStep;
 
     @OneToMany(mappedBy = "product", cascade =  CascadeType.ALL)
     List<Rating> ratings = new ArrayList<>();
