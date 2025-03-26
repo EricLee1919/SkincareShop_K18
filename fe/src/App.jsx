@@ -6,6 +6,8 @@ import Layout from "./components/layout/Layout";
 import AdminLayout from "./components/layout/AdminLayout";
 import { Toaster } from "react-hot-toast";
 import ForgotPassword from "./pages/ForgotPassword";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
 // Pages
 import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
@@ -208,6 +210,10 @@ const App = () => {
               </Layout>
             }
           />
+
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+
           <Route
             path="/register"
             element={
