@@ -6,6 +6,7 @@ import {
   Visibility,
   VisibilityOff,
 } from "@mui/icons-material";
+import LockIcon from "@mui/icons-material/Lock";
 import {
   Container,
   Box,
@@ -23,6 +24,7 @@ import {
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 
+// Valid func to register
 const validationSchema = Yup.object({
   firstName: Yup.string().required("First name is required"),
   lastName: Yup.string().required("Last name is required"),
@@ -32,6 +34,22 @@ const validationSchema = Yup.object({
     .required("Email is required"),
   password: Yup.string()
     .min(6, "Password must be at least 6 characters")
+    .matches(
+      /^(?!\s*$).+/, // Ensures password is not just whitespace
+      "Password cannot be empty or contain only spaces"
+    )
+    .matches(
+      /^(?=.*[a-zA-Z])/, // At least one letter
+      "Password must contain at least one letter"
+    )
+    .matches(
+      /^(?=.*\d)/, // At least one number
+      "Password must contain at least one number"
+    )
+    .matches(
+      /^(?=.*[!@#$%^&*(),.?":{}|<>])/, // At least one special character
+      'Password must contain at least one special character (!@#$%^&*(),.?":{}|<>)'
+    )
     .required("Password is required"),
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("password"), null], "Passwords must match")
@@ -314,7 +332,7 @@ const Register = () => {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <Visibility />
+                        <LockIcon />
                       </InputAdornment>
                     ),
                     endAdornment: (
@@ -328,6 +346,47 @@ const Register = () => {
                     ),
                   }}
                 />
+                {/* Updated password requirements styling */}
+                <Box
+                  sx={{
+                    mt: 1,
+                    mb: 2,
+                    p: 2,
+                    bgcolor: "grey.50",
+                    borderRadius: 1,
+                    border: "1px solid",
+                    borderColor: "grey.200",
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{
+                      display: "block",
+                      fontWeight: 500,
+                      mb: 1,
+                    }}
+                  >
+                    Password Requirements:
+                  </Typography>
+                  <Box
+                    component="ul"
+                    sx={{
+                      m: 0,
+                      pl: 2,
+                      "& li": {
+                        fontSize: "0.75rem",
+                        color: "text.secondary",
+                        mb: 0.5,
+                      },
+                    }}
+                  >
+                    <li>At least 6 characters</li>
+                    <li>At least one letter (a-z or A-Z)</li>
+                    <li>At least one number (0-9)</li>
+                    <li>At least one special character (!@#$%^&*(),.?":{}|)</li>
+                  </Box>
+                </Box>
 
                 <TextField
                   fullWidth
@@ -350,7 +409,7 @@ const Register = () => {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <Visibility />
+                        <LockIcon />
                       </InputAdornment>
                     ),
                     endAdornment: (

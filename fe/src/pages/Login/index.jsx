@@ -1,8 +1,8 @@
-import userIcon from "/src/assets/userIcon.png";
-import passwordIcon from "/src/assets/passwordIcon.png";
+import { AccountCircle } from "@mui/icons-material";
 import { InputAdornment } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useNavigate, Link as RouterLink, useLocation } from "react-router-dom";
+import LockIcon from "@mui/icons-material/Lock";
 import {
   Container,
   Box,
@@ -201,12 +201,7 @@ const Login = () => {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <img
-                          src={userIcon}
-                          alt="User Icon"
-                          width={24}
-                          height={24}
-                        />
+                        <AccountCircle />
                       </InputAdornment>
                     ),
                   }}
@@ -232,12 +227,7 @@ const Login = () => {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <img
-                          src={passwordIcon}
-                          alt="Password Icon"
-                          width={24}
-                          height={24}
-                        />
+                        <LockIcon />
                       </InputAdornment>
                     ),
                     endAdornment: (

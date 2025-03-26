@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Container,
   Box,
@@ -15,26 +15,26 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-} from '@mui/material';
-import { Formik, Form } from 'formik';
-import * as Yup from 'yup';
-import { getCurrentUser } from '../../store/slices/authSlice';
-import { updateUser } from '../../store/slices/authSlice';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
-import ErrorMessage from '../../components/common/ErrorMessage';
+} from "@mui/material";
+import { Formik, Form } from "formik";
+import * as Yup from "yup";
+import { getCurrentUser } from "../../store/slices/authSlice";
+import { updateUser } from "../../store/slices/authSlice";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
+import ErrorMessage from "../../components/common/ErrorMessage";
 
 const validationSchema = Yup.object({
   firstName: Yup.string()
-    .min(2, 'First name must be at least 2 characters')
-    .required('First name is required'),
+    .min(2, "First name must be at least 2 characters")
+    .required("First name is required"),
   lastName: Yup.string()
-    .min(2, 'Last name must be at least 2 characters')
-    .required('Last name is required'),
+    .min(2, "Last name must be at least 2 characters")
+    .required("Last name is required"),
   email: Yup.string()
-    .email('Invalid email address')
-    .required('Email is required'),
+    .email("Invalid email address")
+    .required("Email is required"),
   phone: Yup.string()
-    .matches(/^[0-9]{10}$/, 'Phone number must be 10 digits')
+    .matches(/^[0-9]{10}$/, "Phone number must be 10 digits")
     .nullable(),
   address: Yup.string().nullable(),
 });
@@ -49,13 +49,45 @@ const Profile = () => {
     dispatch(getCurrentUser());
   }, [dispatch]);
 
+  // Handle form submission
   const handleEditSubmit = async (values, { setSubmitting }) => {
     try {
-      await dispatch(updateUser(values)).unwrap();
-      setEditDialogOpen(false);
       setEditError(null);
+      console.log("Attempting to update profile with:", values);
+
+      // Add validation before submission
+      if (!values.firstName || !values.lastName || !values.email) {
+        throw new Error("Required fields cannot be empty");
+      }
+
+      const result = await dispatch(updateUser(values)).unwrap();
+      console.log("Profile update successful:", result);
+
+      setEditDialogOpen(false);
     } catch (error) {
-      setEditError(error.message || 'Failed to update profile');
+      console.error("Profile update error:", error);
+
+      // Handle specific error cases
+      if (error.message?.includes("email")) {
+        setEditError(
+          "Email is already in use. Please use another email address."
+        );
+      } else if (error.message?.includes("network")) {
+        setEditError(
+          "Network error. Please check your connection and try again."
+        );
+      } else if (
+        error.message?.includes("401") ||
+        error.message?.includes("403")
+      ) {
+        setEditError("Session expired. Please log in again.");
+        // Optionally redirect to login
+        // navigate('/login');
+      } else {
+        setEditError(
+          error.message || "Failed to update profile. Please try again."
+        );
+      }
     } finally {
       setSubmitting(false);
     }
@@ -66,7 +98,12 @@ const Profile = () => {
   }
 
   if (error) {
-    return <ErrorMessage message={error} onRetry={() => dispatch(getCurrentUser())} />;
+    return (
+      <ErrorMessage
+        message={error}
+        onRetry={() => dispatch(getCurrentUser())}
+      />
+    );
   }
 
   if (!user) {
@@ -78,7 +115,7 @@ const Profile = () => {
       <Grid container spacing={3}>
         <Grid item xs={12} md={4}>
           <Paper sx={{ p: 3, mb: 3 }}>
-            <Box sx={{ textAlign: 'center', mb: 3 }}>
+            <Box sx={{ textAlign: "center", mb: 3 }}>
               <Typography variant="h5" gutterBottom>
                 Profile Information
               </Typography>
@@ -140,29 +177,44 @@ const Profile = () => {
 
       <Dialog
         open={editDialogOpen}
-        onClose={() => setEditDialogOpen(false)}
+        onClose={() => {
+          setEditDialogOpen(false);
+          setEditError(null); // Clear error when closing dialog
+        }}
         maxWidth="sm"
         fullWidth
       >
         <DialogTitle>Edit Profile</DialogTitle>
         <DialogContent>
           {editError && (
-            <Alert severity="error" sx={{ mb: 2 }}>
+            <Alert
+              severity="error"
+              sx={{ mb: 2 }}
+              onClose={() => setEditError(null)} // Allow dismissing error
+            >
               {editError}
             </Alert>
           )}
           <Formik
             initialValues={{
-              firstName: user.firstName,
-              lastName: user.lastName,
-              email: user.email,
-              phone: user.phone || '',
-              address: user.address || '',
+              firstName: user.firstName || "",
+              lastName: user.lastName || "",
+              email: user.email || "",
+              phone: user.phone || "",
+              address: user.address || "",
             }}
             validationSchema={validationSchema}
             onSubmit={handleEditSubmit}
+            enableReinitialize // Add this to update form when user data changes
           >
-            {({ values, errors, touched, handleChange, handleBlur, isSubmitting }) => (
+            {({
+              values,
+              errors,
+              touched,
+              handleChange,
+              handleBlur,
+              isSubmitting,
+            }) => (
               <Form>
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={6}>
@@ -172,7 +224,10 @@ const Profile = () => {
                       name="firstName"
                       label="First Name"
                       value={values.firstName}
-                      onChange={handleChange}
+                      onChange={(e) => {
+                        handleChange(e);
+                        setEditError(null); // Clear error when user types
+                      }}
                       onBlur={handleBlur}
                       error={touched.firstName && Boolean(errors.firstName)}
                       helperText={touched.firstName && errors.firstName}
@@ -238,14 +293,25 @@ const Profile = () => {
                   </Grid>
                 </Grid>
                 <DialogActions sx={{ mt: 3 }}>
-                  <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
+                  <Button
+                    onClick={() => {
+                      setEditDialogOpen(false);
+                      setEditError(null);
+                    }}
+                  >
+                    Cancel
+                  </Button>
                   <Button
                     type="submit"
                     variant="contained"
                     color="primary"
                     disabled={isSubmitting}
                   >
-                    {isSubmitting ? <CircularProgress size={24} /> : 'Save Changes'}
+                    {isSubmitting ? (
+                      <CircularProgress size={24} />
+                    ) : (
+                      "Save Changes"
+                    )}
                   </Button>
                 </DialogActions>
               </Form>
@@ -257,4 +323,4 @@ const Profile = () => {
   );
 };
 
-export default Profile; 
+export default Profile;

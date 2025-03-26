@@ -1,10 +1,10 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
 
-const API_URL = 'http://localhost:8080/api';
+const API_URL = "http://localhost:8080/api";
 
 export const fetchProducts = createAsyncThunk(
-  'products/fetchProducts',
+  "products/fetchProducts",
   async ({ filters, searchTerm, sortBy }, { rejectWithValue }) => {
     try {
       const { category, priceRange, rating } = filters;
@@ -17,33 +17,37 @@ export const fetchProducts = createAsyncThunk(
         minRating: rating || 0,
       });
 
-      console.log('Fetching products with params:', params.toString());
+      console.log("Fetching products with params:", params.toString());
       const response = await axios.get(`${API_URL}/product?${params}`);
       return response.data;
     } catch (error) {
-      console.error('Error fetching products:', error);
-      return rejectWithValue(error.response?.data?.message || 'Failed to fetch products');
+      console.error("Error fetching products:", error);
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch products"
+      );
     }
   }
 );
 
 export const fetchProductById = createAsyncThunk(
-  'products/fetchProductById',
+  "products/fetchProductById",
   async (productId, { rejectWithValue }) => {
     try {
       const response = await axios.get(`${API_URL}/product/${productId}`);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to fetch product');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch product"
+      );
     }
   }
 );
 
 export const createProduct = createAsyncThunk(
-  'products/createProduct',
+  "products/createProduct",
   async (productData, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       const response = await axios.post(`${API_URL}/product`, productData, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -55,10 +59,10 @@ export const createProduct = createAsyncThunk(
 );
 
 export const updateProduct = createAsyncThunk(
-  'products/updateProduct',
+  "products/updateProduct",
   async ({ id, productData }, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       const response = await axios.put(
         `${API_URL}/product/${id}`,
         productData,
@@ -74,10 +78,10 @@ export const updateProduct = createAsyncThunk(
 );
 
 export const deleteProduct = createAsyncThunk(
-  'products/deleteProduct',
+  "products/deleteProduct",
   async (id, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       await axios.delete(`${API_URL}/product/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -98,7 +102,7 @@ const initialState = {
 };
 
 const productSlice = createSlice({
-  name: 'products',
+  name: "products",
   initialState,
   reducers: {
     clearSelectedProduct: (state) => {
@@ -147,7 +151,7 @@ const productSlice = createSlice({
       })
       .addCase(createProduct.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload?.message || 'Failed to create product';
+        state.error = action.payload?.message || "Failed to create product";
       })
       // Update Product
       .addCase(updateProduct.pending, (state) => {
@@ -168,7 +172,7 @@ const productSlice = createSlice({
       })
       .addCase(updateProduct.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload?.message || 'Failed to update product';
+        state.error = action.payload?.message || "Failed to update product";
       })
       // Delete Product
       .addCase(deleteProduct.pending, (state) => {
@@ -186,10 +190,10 @@ const productSlice = createSlice({
       })
       .addCase(deleteProduct.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload?.message || 'Failed to delete product';
+        state.error = action.payload?.message || "Failed to delete product";
       });
   },
 });
 
 export const { clearSelectedProduct, clearError } = productSlice.actions;
-export default productSlice.reducer; 
+export default productSlice.reducer;

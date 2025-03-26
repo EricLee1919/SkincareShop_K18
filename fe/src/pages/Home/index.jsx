@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import {
   Box,
   Container,
@@ -10,13 +10,13 @@ import {
   CardContent,
   CardMedia,
   Divider,
-} from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchProducts } from '../../store/slices/productSlice';
-import ProductCard from '../../components/product/ProductCard';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
-import ErrorMessage from '../../components/common/ErrorMessage';
+} from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchProducts } from "../../store/slices/productSlice";
+import ProductCard from "../../components/product/ProductCard";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
+import ErrorMessage from "../../components/common/ErrorMessage";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -25,19 +25,21 @@ const Home = () => {
   const [featuredProducts, setFeaturedProducts] = useState([]);
 
   useEffect(() => {
-    dispatch(fetchProducts({ filters: {}, searchTerm: '', sortBy: 'popularity' }));
+    dispatch(
+      fetchProducts({ filters: {}, searchTerm: "", sortBy: "popularity" })
+    );
   }, [dispatch]);
 
   useEffect(() => {
     if (products && products.length > 0) {
       // Filter out any deleted products, just in case
-      const activeProducts = products.filter(product => !product.isDeleted);
+      const activeProducts = products.filter((product) => !product.isDeleted);
       setFeaturedProducts(activeProducts.slice(0, 4));
     }
   }, [products]);
 
   const handleShopNow = () => {
-    navigate('/products');
+    navigate("/products");
   };
 
   return (
@@ -45,21 +47,21 @@ const Home = () => {
       {/* Hero Section */}
       <Paper
         sx={{
-          position: 'relative',
-          height: { xs: '60vh', md: '80vh' },
-          backgroundColor: 'primary.main',
-          color: 'white',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          display: 'flex',
-          alignItems: 'center',
+          position: "relative",
+          height: { xs: "60vh", md: "80vh" },
+          backgroundColor: "primary.main",
+          color: "white",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          display: "flex",
+          alignItems: "center",
           borderRadius: 0,
         }}
       >
         <Container maxWidth="lg">
           <Box
             sx={{
-              maxWidth: { xs: '100%', md: '50%' },
+              maxWidth: { xs: "100%", md: "50%" },
               p: { xs: 3, md: 0 },
             }}
           >
@@ -69,7 +71,7 @@ const Home = () => {
               gutterBottom
               sx={{
                 fontWeight: 700,
-                textShadow: '1px 1px 2px rgba(0,0,0,0.1)',
+                textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
               }}
             >
               Discover Your Skin's True Potential
@@ -79,11 +81,12 @@ const Home = () => {
               component="p"
               paragraph
               sx={{
-                textShadow: '1px 1px 2px rgba(0,0,0,0.1)',
+                textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
                 mb: 4,
               }}
             >
-              Premium skincare products that nourish and reveal your natural beauty.
+              Premium skincare products that nourish and reveal your natural
+              beauty.
             </Typography>
             <Button
               variant="contained"
@@ -93,7 +96,7 @@ const Home = () => {
               sx={{
                 py: 1.5,
                 px: 4,
-                fontSize: '1.1rem',
+                fontSize: "1.1rem",
               }}
             >
               Shop Now
@@ -122,13 +125,13 @@ const Home = () => {
             <Card
               sx={{
                 height: 320,
-                cursor: 'pointer',
-                transition: 'transform 0.3s',
-                '&:hover': {
-                  transform: 'translateY(-8px)',
+                cursor: "pointer",
+                transition: "transform 0.3s",
+                "&:hover": {
+                  transform: "translateY(-8px)",
                 },
               }}
-              onClick={() => navigate('/products?category=face')}
+              onClick={() => navigate("/products?category=face")}
             >
               <CardMedia
                 component="img"
@@ -150,13 +153,13 @@ const Home = () => {
             <Card
               sx={{
                 height: 320,
-                cursor: 'pointer',
-                transition: 'transform 0.3s',
-                '&:hover': {
-                  transform: 'translateY(-8px)',
+                cursor: "pointer",
+                transition: "transform 0.3s",
+                "&:hover": {
+                  transform: "translateY(-8px)",
                 },
               }}
-              onClick={() => navigate('/products?category=body')}
+              onClick={() => navigate("/products?category=body")}
             >
               <CardMedia
                 component="img"
@@ -178,13 +181,13 @@ const Home = () => {
             <Card
               sx={{
                 height: 320,
-                cursor: 'pointer',
-                transition: 'transform 0.3s',
-                '&:hover': {
-                  transform: 'translateY(-8px)',
+                cursor: "pointer",
+                transition: "transform 0.3s",
+                "&:hover": {
+                  transform: "translateY(-8px)",
                 },
               }}
-              onClick={() => navigate('/products?category=hair')}
+              onClick={() => navigate("/products?category=hair")}
             >
               <CardMedia
                 component="img"
@@ -206,13 +209,13 @@ const Home = () => {
             <Card
               sx={{
                 height: 320,
-                cursor: 'pointer',
-                transition: 'transform 0.3s',
-                '&:hover': {
-                  transform: 'translateY(-8px)',
+                cursor: "pointer",
+                transition: "transform 0.3s",
+                "&:hover": {
+                  transform: "translateY(-8px)",
                 },
               }}
-              onClick={() => navigate('/products?category=sets')}
+              onClick={() => navigate("/products?category=sets")}
             >
               <CardMedia
                 component="img"
@@ -234,7 +237,7 @@ const Home = () => {
       </Container>
 
       {/* Featured Products */}
-      <Box sx={{ bgcolor: 'grey.50', py: 8 }}>
+      <Box sx={{ bgcolor: "grey.50", py: 8 }}>
         <Container maxWidth="lg">
           <Typography variant="h4" component="h2" align="center" gutterBottom>
             Featured Products
@@ -252,7 +255,10 @@ const Home = () => {
           {loading ? (
             <LoadingSpinner message="Loading featured products..." />
           ) : error ? (
-            <ErrorMessage message={error} onRetry={() => dispatch(fetchProducts({}))} />
+            <ErrorMessage
+              message={error}
+              onRetry={() => dispatch(fetchProducts({}))}
+            />
           ) : (
             <Grid container spacing={3}>
               {featuredProducts.map((product) => (
@@ -285,8 +291,8 @@ const Home = () => {
               src="https://placehold.jp/3d4070/ffffff/800x600.png?text=About+Us"
               alt="About Us"
               sx={{
-                width: '100%',
-                height: 'auto',
+                width: "100%",
+                height: "auto",
                 borderRadius: 2,
                 boxShadow: 3,
               }}
@@ -297,18 +303,19 @@ const Home = () => {
               About Our Brand
             </Typography>
             <Typography variant="body1" paragraph>
-              At SkinCare, we believe that beautiful skin starts with healthy ingredients.
-              Our products are carefully formulated using the finest natural ingredients,
-              backed by scientific research.
+              At SkinCare, we believe that beautiful skin starts with healthy
+              ingredients. Our products are carefully formulated using the
+              finest natural ingredients, backed by scientific research.
             </Typography>
             <Typography variant="body1" paragraph>
-              Founded in 2010, we've been dedicated to creating effective, sustainable,
-              and cruelty-free skincare products that help you achieve your best skin.
+              Founded in 2010, we've been dedicated to creating effective,
+              sustainable, and cruelty-free skincare products that help you
+              achieve your best skin.
             </Typography>
             <Button
               variant="outlined"
               color="primary"
-              onClick={() => navigate('/about')}
+              onClick={() => navigate("/about")}
               sx={{ mt: 2 }}
             >
               Learn More
@@ -318,7 +325,7 @@ const Home = () => {
       </Container>
 
       {/* Testimonials */}
-      <Box sx={{ bgcolor: 'grey.50', py: 8 }}>
+      <Box sx={{ bgcolor: "grey.50", py: 8 }}>
         <Container maxWidth="lg">
           <Typography variant="h4" component="h2" align="center" gutterBottom>
             What Our Customers Say
@@ -335,11 +342,12 @@ const Home = () => {
 
           <Grid container spacing={4}>
             <Grid item xs={12} md={4}>
-              <Card sx={{ height: '100%' }}>
+              <Card sx={{ height: "100%" }}>
                 <CardContent>
                   <Typography variant="body1" paragraph>
-                    "I've been using the Complete Skincare Set for three months and my skin
-                    has never looked better. The moisturizer is especially amazing!"
+                    "I've been using the Complete Skincare Set for three months
+                    and my skin has never looked better. The moisturizer is
+                    especially amazing!"
                   </Typography>
                   <Divider sx={{ my: 2 }} />
                   <Typography variant="subtitle2" color="primary">
@@ -352,11 +360,11 @@ const Home = () => {
               </Card>
             </Grid>
             <Grid item xs={12} md={4}>
-              <Card sx={{ height: '100%' }}>
+              <Card sx={{ height: "100%" }}>
                 <CardContent>
                   <Typography variant="body1" paragraph>
-                    "The Hydrating Serum has completely transformed my dry skin. It's gentle
-                    but effective, and a little goes a long way."
+                    "The Hydrating Serum has completely transformed my dry skin.
+                    It's gentle but effective, and a little goes a long way."
                   </Typography>
                   <Divider sx={{ my: 2 }} />
                   <Typography variant="subtitle2" color="primary">
@@ -369,11 +377,12 @@ const Home = () => {
               </Card>
             </Grid>
             <Grid item xs={12} md={4}>
-              <Card sx={{ height: '100%' }}>
+              <Card sx={{ height: "100%" }}>
                 <CardContent>
                   <Typography variant="body1" paragraph>
-                    "I'm impressed with how quickly the Brightening Cream evened out my skin
-                    tone. It's now a permanent part of my skincare routine!"
+                    "I'm impressed with how quickly the Brightening Cream evened
+                    out my skin tone. It's now a permanent part of my skincare
+                    routine!"
                   </Typography>
                   <Divider sx={{ my: 2 }} />
                   <Typography variant="subtitle2" color="primary">
@@ -392,4 +401,4 @@ const Home = () => {
   );
 };
 
-export default Home; 
+export default Home;
