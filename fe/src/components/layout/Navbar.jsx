@@ -376,9 +376,11 @@ const Navbar = () => {
                   flex: 1,
                   display: "flex",
                   justifyContent: "center",
-                  px: 2,
-                  maxWidth: "800px",
+                  alignItems: "center",
+                  px: { xs: 1, md: 4 },
+                  maxWidth: { xs: "100%", md: "600px" },
                   width: "100%",
+                  position: "relative",
                 }}
               >
                 <ProductSearch />
