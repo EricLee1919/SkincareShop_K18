@@ -11,10 +11,12 @@ import {
   CardContent,
   Popper,
   ClickAwayListener,
+  InputAdornment,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import debounce from "lodash.debounce";
 import ProductApi from "../../api/ProductApi";
+import SearchIcon from "@mui/icons-material/Search";
 
 const ProductSearch = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -36,8 +38,8 @@ const ProductSearch = () => {
 
         setLoading(true);
         try {
-          const response = await ProductApi.searchProducts(query);
-          setSearchResults(response);
+          const results = await ProductApi.searchProducts(query);
+          setSearchResults(results);
           setOpen(true);
         } catch (error) {
           console.error("Error fetching search results:", error);
@@ -84,15 +86,37 @@ const ProductSearch = () => {
           sx={{
             backgroundColor: "white",
             "& .MuiOutlinedInput-root": {
-              borderRadius: "8px",
+              borderRadius: "25px",
+              height: "40px",
+              "& fieldset": {
+                borderColor: "rgba(0, 0, 0, 0.1)",
+              },
               "&:hover fieldset": {
                 borderColor: "primary.main",
               },
               "&.Mui-focused fieldset": {
                 borderColor: "primary.main",
-                borderWidth: "2px",
+              },
+              "& input": {
+                padding: "8px 14px",
+                fontSize: "0.9rem",
               },
             },
+            "& .MuiInputAdornment-root": {
+              marginLeft: "8px",
+            },
+          }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start" sx={{ ml: 1 }}>
+                <SearchIcon
+                  sx={{
+                    color: "action.active",
+                    fontSize: "1.2rem",
+                  }}
+                />
+              </InputAdornment>
+            ),
           }}
         />
 
@@ -112,7 +136,6 @@ const ProductSearch = () => {
               overflow: "auto",
               boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
               borderRadius: "8px",
-              border: "1px solid #e0e0e0",
             }}
           >
             {loading ? (
@@ -128,8 +151,7 @@ const ProductSearch = () => {
                     p: 1.5,
                     cursor: "pointer",
                     border: "none",
-                    borderRadius: 0,
-                    borderBottom: "1px solid #f0f0f0",
+                    borderBottom: "1px solid rgba(0, 0, 0, 0.05)",
                     "&:hover": {
                       backgroundColor: "rgba(25, 118, 210, 0.04)",
                     },
@@ -170,7 +192,10 @@ const ProductSearch = () => {
                     <Typography
                       variant="body2"
                       color="primary"
-                      sx={{ fontWeight: 600 }}
+                      sx={{
+                        fontWeight: 600,
+                        fontSize: "0.9rem",
+                      }}
                     >
                       ${product.price.toFixed(2)}
                     </Typography>
@@ -194,5 +219,4 @@ const ProductSearch = () => {
     </ClickAwayListener>
   );
 };
-
 export default ProductSearch;
