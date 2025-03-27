@@ -371,6 +371,7 @@ const Navbar = () => {
                 />
               )}
               {/* Add the ProductSearch component here */}
+
               <Box
                 sx={{
                   flex: 1,
@@ -380,7 +381,6 @@ const Navbar = () => {
                   px: { xs: 1, md: 4 },
                   maxWidth: { xs: "100%", md: "600px" },
                   width: "100%",
-                  position: "relative",
                 }}
               >
                 <ProductSearch />

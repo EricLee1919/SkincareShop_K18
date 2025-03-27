@@ -1,7 +1,13 @@
-import api from "./axiosinstance";
+import api from "./axiosInstance";
 
-function getProduct() {
-  return api.get("/api/product");
-}
-const ProductAPI = { getProduct };
+const ProductAPI = {
+  getProduct() {
+    return api.get("/api/product");
+  },
+
+  searchProducts(query) {
+    return api.get(`/api/products/search?q=${encodeURIComponent(query)}`);
+  },
+};
+
 export default ProductAPI;

@@ -1,157 +1,103 @@
-import { useState, useEffect, useRef } from "react";
-import SearchIcon from "@mui/icons-material/Search";
+// src/components/product/ProductSearch.jsx
+import React, { useState, useEffect } from "react";
 import {
-  IconButton,
-  InputBase,
-  Paper,
+  TextField,
   Box,
+  CircularProgress,
   Typography,
+  Paper,
   Card,
   CardMedia,
   CardContent,
   Popper,
   ClickAwayListener,
-  CircularProgress,
 } from "@mui/material";
-import ProductApi from "../../api/ProductApi";
 import { useNavigate } from "react-router-dom";
+import debounce from "lodash.debounce";
+import ProductApi from "../../api/ProductApi";
 
 const ProductSearch = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [results, setResults] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
-  const [shouldSearch, setShouldSearch] = useState(false);
-  const searchRef = useRef(null);
+  const searchRef = React.useRef(null);
   const navigate = useNavigate();
 
-  const handleSearch = async (value) => {
-    if (!value.trim() || value.length < 2) {
-      setResults([]);
-      setOpen(false);
-      return;
-    }
+  // Create debounced search function
+  const debouncedSearch = React.useMemo(
+    () =>
+      debounce(async (query) => {
+        if (!query || query.length < 2) {
+          setSearchResults([]);
+          setOpen(false);
+          return;
+        }
 
-    if (!shouldSearch) {
-      setShouldSearch(true);
-      return;
-    }
+        setLoading(true);
+        try {
+          const response = await ProductApi.searchProducts(query);
+          setSearchResults(response);
+          setOpen(true);
+        } catch (error) {
+          console.error("Error fetching search results:", error);
+          setSearchResults([]);
+        } finally {
+          setLoading(false);
+        }
+      }, 500),
+    []
+  );
 
-    try {
-      setLoading(true);
-      const response = await ProductApi.searchProducts(value);
-      setResults(response);
-      setOpen(true);
-    } catch (error) {
-      console.error("Search error:", error);
-      setResults([]);
-    } finally {
-      setLoading(false);
-    }
+  // Handle search input change
+  const handleSearchChange = (event) => {
+    const { value } = event.target;
+    setSearchQuery(value);
+    debouncedSearch(value);
   };
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (shouldSearch) {
-        handleSearch(searchTerm);
-      }
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [searchTerm, shouldSearch]);
-
-  const handleInputChange = (e) => {
-    setSearchTerm(e.target.value);
-    if (!shouldSearch && e.target.value.length >= 2) {
-      setShouldSearch(true);
-    }
-  };
-
+  // Handle product click
   const handleProductClick = (productId) => {
     setOpen(false);
-    setSearchTerm("");
-    setShouldSearch(false);
+    setSearchQuery("");
     navigate(`/product/${productId}`);
   };
 
-  const handleClear = () => {
-    setSearchTerm("");
-    setResults([]);
-    setOpen(false);
-    setShouldSearch(false);
-  };
+  // Cleanup debounce on unmount
+  useEffect(() => {
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [debouncedSearch]);
 
   return (
     <ClickAwayListener onClickAway={() => setOpen(false)}>
       <Box sx={{ position: "relative", width: "100%", maxWidth: 600 }}>
-        <Paper
+        <TextField
           ref={searchRef}
-          component="form"
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSearch(searchTerm);
-          }}
+          fullWidth
+          placeholder="Search products..."
+          value={searchQuery}
+          onChange={handleSearchChange}
+          variant="outlined"
+          size="small"
           sx={{
-            display: "flex",
-            alignItems: "center",
-            width: "100%",
-            borderRadius: "8px",
             backgroundColor: "white",
-            border: "2px solid",
-            borderColor: open ? "primary.main" : "transparent",
-            transition: "all 0.3s ease",
-            boxShadow: "0 2px 5px rgba(0,0,0,0.08)",
-            "&:hover": {
-              boxShadow: "0 4px 10px rgba(0,0,0,0.12)",
+            "& .MuiOutlinedInput-root": {
+              borderRadius: "8px",
+              "&:hover fieldset": {
+                borderColor: "primary.main",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "primary.main",
+                borderWidth: "2px",
+              },
             },
           }}
-        >
-          <IconButton
-            sx={{
-              p: "10px",
-              color: "action.active",
-            }}
-          >
-            <SearchIcon />
-          </IconButton>
-
-          <InputBase
-            sx={{
-              ml: 1,
-              flex: 1,
-              "& .MuiInputBase-input": {
-                padding: "12px 8px",
-                fontSize: "0.95rem",
-                "&::placeholder": {
-                  color: "#9e9e9e",
-                  opacity: 1,
-                },
-              },
-            }}
-            placeholder="Search products..."
-            value={searchTerm}
-            onChange={handleInputChange}
-          />
-
-          {searchTerm && (
-            <IconButton
-              size="small"
-              onClick={handleClear}
-              sx={{
-                mx: 1.5,
-                color: "action.active",
-                "&:hover": {
-                  color: "primary.main",
-                },
-              }}
-            >
-              ×
-            </IconButton>
-          )}
-        </Paper>
+        />
 
         <Popper
-          open={open && results.length > 0}
+          open={open && searchResults.length > 0}
           anchorEl={searchRef.current}
           placement="bottom-start"
           style={{
@@ -173,8 +119,8 @@ const ProductSearch = () => {
               <Box sx={{ p: 3, display: "flex", justifyContent: "center" }}>
                 <CircularProgress size={24} color="primary" />
               </Box>
-            ) : results.length > 0 ? (
-              results.map((product) => (
+            ) : searchResults.length > 0 ? (
+              searchResults.map((product) => (
                 <Card
                   key={product.id}
                   sx={{
@@ -231,7 +177,7 @@ const ProductSearch = () => {
                   </CardContent>
                 </Card>
               ))
-            ) : searchTerm.length >= 2 && !loading ? (
+            ) : searchQuery.length >= 2 && !loading ? (
               <Box
                 sx={{
                   p: 3,
