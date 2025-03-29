@@ -1,10 +1,24 @@
+<<<<<<< HEAD
+import { useEffect } from "react";
+import { useParams } from "react-router-dom";
+=======
 import { Favorite, ShoppingCart } from "@mui/icons-material";
+>>>>>>> 59e7285f1b6cc0172d5ec90bf703a408cd228f80
 import {
   Box,
   Button,
   Chip,
   Container,
   Divider,
+<<<<<<< HEAD
+} from "@mui/material";
+import { ShoppingCart, Favorite } from "@mui/icons-material";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchProductById } from "../../store/slices/productSlice";
+import { addToCart } from "../../store/slices/cartSlice";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
+import ErrorMessage from "../../components/common/ErrorMessage";
+=======
   Grid,
   Rating,
   Typography,
@@ -17,6 +31,7 @@ import ErrorMessage from "../../components/common/ErrorMessage";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 import { addToCart } from "../../store/slices/cartSlice";
 import { fetchProductById } from "../../store/slices/productSlice";
+>>>>>>> 59e7285f1b6cc0172d5ec90bf703a408cd228f80
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -28,7 +43,7 @@ const ProductDetail = () => {
   } = useSelector((state) => state.products);
   const { items } = useSelector((state) => state.cart);
   const isInCart = items.some((item) => item.id === product?.id);
-
+  console.log(product);
   useEffect(() => {
     if (id) {
       dispatch(fetchProductById(id));
