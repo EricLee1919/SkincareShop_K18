@@ -276,10 +276,7 @@ const AdminProducts = () => {
                         </TableCell>
                         <TableCell>{product.name}</TableCell>
                         <TableCell>{product.category?.name}</TableCell>
-                        <TableCell>{product.price.toLocaleString('vi-VN', {
-                         style: 'currency',
-                          currency: 'VND'
-                           })} </TableCell>
+                        <TableCell>${product.price.toFixed(2)}</TableCell>
                         <TableCell>{product.quantity}</TableCell>
                         <TableCell>{product.code}</TableCell>
 

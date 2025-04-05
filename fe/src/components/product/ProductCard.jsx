@@ -12,33 +12,60 @@ import {
   Typography,
 } from "@mui/material";
 import numeral from "numeral";
-import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { addToCart } from "../../store/slices/cartSlice";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addToCart,
+  addToWishlist,
+  removeFromWishlist,
+  selectWishlistItems,
+} from "../../store/slices/cartSlice";
 
 const ProductCard = ({ product }) => {
   const dispatch = useDispatch();
-  const [isFavorite, setIsFavorite] = useState(false);
   const navigate = useNavigate();
-  const { items } = useSelector((state) => state.cart);
-  const isInCart = items.some((item) => item.id === product.id);
+
+  const { items: cartItems } = useSelector((state) => state.cart);
+  const wishlist = useSelector(selectWishlistItems);
+
+  const isInCart = cartItems.some((item) => item.id === product.id);
+  const isFavorite = wishlist.some((item) => item.id === product.id);
 
   const handleAddToCart = (e) => {
     e.stopPropagation();
-    dispatch(addToCart(product));
+    if (!isInCart) {
+      dispatch(addToCart(product));
+    }
   };
 
   const handleToggleFavorite = (e) => {
     e.stopPropagation();
-    setIsFavorite(!isFavorite);
+    if (isFavorite) {
+      dispatch(removeFromWishlist(product.id));
+    } else {
+      dispatch(addToWishlist(product));
+    }
   };
 
-  const handleOnClick = () => {
+  const handleOnClick = (e) => {
+    // Check if the click is on any interactive element
+    const isInteractiveElement =
+      e.target.closest("button") ||
+      e.target.closest("svg") ||
+      e.target.closest(".MuiIconButton-root") ||
+      e.target.closest(".MuiButton-root") ||
+      e.target.closest(".MuiTooltip-root") ||
+      e.target.closest(".MuiIcon-root") ||
+      e.target.closest(".MuiTouchRipple-root");
+
+    if (isInteractiveElement) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
     navigate(`/products/${product.id}`);
   };
 
-  // ✅ Tính trung bình đánh giá từ feedback
   const averageRating =
     product.feedback && product.feedback.length > 0
       ? product.feedback.reduce((sum, r) => sum + r.rate, 0) /
@@ -93,7 +120,7 @@ const ProductCard = ({ product }) => {
           Code: {product.code}
         </Typography>
 
-        {/* ⭐ Rating */}
+        {/* Rating */}
         <Box display="flex" alignItems="center" mb={1}>
           <Rating value={averageRating} precision={0.5} readOnly size="small" />
           <Typography variant="body2" color="text.secondary" sx={{ ml: 0.5 }}>
@@ -102,37 +129,46 @@ const ProductCard = ({ product }) => {
         </Box>
 
         {/* Category */}
-        {product.category?.name && (
-          <Chip
-            label={product.category.name}
-            size="small"
-            variant="outlined"
-            sx={{ mb: 1 }}
-          />
-        )}
-
-        {product.suitableTypes.map((item) => {
-          return (
+        <div
+          style={{
+            height: 100,
+          }}
+        >
+          {product.category?.name && (
             <Chip
-              key={item}
-              label={item}
+              label={product.category.name}
               size="small"
               variant="outlined"
               sx={{ mb: 1 }}
             />
-          );
-        })}
+          )}
 
-        <Typography variant="h6" color="primary" fontWeight={600}>
+          {/* Suitable Types */}
+          <Box display="flex" flexWrap="wrap" mb={2}>
+            {product.suitableTypes.map((item) => (
+              <Chip
+                key={item}
+                label={item}
+                size="small"
+                variant="outlined"
+                sx={{ mr: 0.5, mb: 0.5 }}
+              />
+            ))}
+          </Box>
+        </div>
+
+        {/* Price */}
+        <Typography
+          variant="h6"
+          color="primary"
+          fontWeight={600}
+          sx={{ mb: 2 }}
+        >
           {numeral(product.price).format("0,0")} đ
         </Typography>
 
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          mt={2}
-        >
+        {/* Buttons */}
+        <Box display="flex" justifyContent="space-between" alignItems="center">
           <Button
             variant="contained"
             color="primary"
@@ -147,7 +183,16 @@ const ProductCard = ({ product }) => {
           <Tooltip
             title={isFavorite ? "Remove from favorites" : "Add to favorites"}
           >
-            <IconButton onClick={handleToggleFavorite} color="primary">
+            <IconButton
+              onClick={handleToggleFavorite}
+              color="primary"
+              sx={{
+                "&:hover": {
+                  backgroundColor: "rgba(156, 39, 176, 0.04)",
+                },
+                zIndex: 2, // Add z-index to ensure button is clickable
+              }}
+            >
               {isFavorite ? <Favorite /> : <FavoriteBorder />}
             </IconButton>
           </Tooltip>

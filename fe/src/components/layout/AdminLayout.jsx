@@ -93,7 +93,7 @@ const AdminLayout = ({ children }) => {
     { text: "Products", icon: <Inventory />, path: "/admin/products" },
     { text: "Categories", icon: <Category />, path: "/admin/categories" },
     { text: "Orders", icon: <ShoppingCart />, path: "/admin/orders" },
-    { text: "Customers", icon: <People />, path: "/admin/customers" },
+    { text: "Account", icon: <People />, path: "/admin/account" },
   ];
 
   const drawer = (

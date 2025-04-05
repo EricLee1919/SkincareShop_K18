@@ -122,7 +122,7 @@ const Home = () => {
         </Typography>
 
         <Grid container spacing={4}>
-          <Grid item xs={12} sm={6} md={4}>
+          <Grid item xs={12} sm={6} md={3}>
             <Card
               sx={{
                 height: 320,
@@ -137,12 +137,12 @@ const Home = () => {
               <CardMedia
                 component="img"
                 height="200"
-                image="https://images.pexels.com/photos/3762466/pexels-photo-3762466.jpeg?auto=compress&cs=tinysrgb&w=600"
+                image="https://placehold.jp/3d4070/ffffff/600x400.png?text=Face+Care"
                 alt="Face Care"
               />
               <CardContent>
                 <Typography variant="h6" component="h3" gutterBottom>
-                  Cleanser
+                  Face Care
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   Cleansers, moisturizers, and serums for your face
@@ -150,7 +150,7 @@ const Home = () => {
               </CardContent>
             </Card>
           </Grid>
-          <Grid item xs={12} sm={6} md={4}>
+          <Grid item xs={12} sm={6} md={3}>
             <Card
               sx={{
                 height: 320,
@@ -165,7 +165,7 @@ const Home = () => {
               <CardMedia
                 component="img"
                 height="200"
-                image="https://images.pexels.com/photos/3762875/pexels-photo-3762875.jpeg?auto=compress&cs=tinysrgb&w=600"
+                image="https://placehold.jp/3d4070/ffffff/600x400.png?text=Body+Care"
                 alt="Body Care"
               />
               <CardContent>
@@ -178,7 +178,7 @@ const Home = () => {
               </CardContent>
             </Card>
           </Grid>
-          <Grid item xs={12} sm={6} md={4}>
+          <Grid item xs={12} sm={6} md={3}>
             <Card
               sx={{
                 height: 320,
@@ -193,7 +193,7 @@ const Home = () => {
               <CardMedia
                 component="img"
                 height="200"
-                image="https://images.pexels.com/photos/1049687/pexels-photo-1049687.jpeg?auto=compress&cs=tinysrgb&w=600"
+                image="https://placehold.jp/3d4070/ffffff/600x400.png?text=Hair+Care"
                 alt="Hair Care"
               />
               <CardContent>
@@ -206,7 +206,34 @@ const Home = () => {
               </CardContent>
             </Card>
           </Grid>
-          
+          <Grid item xs={12} sm={6} md={3}>
+            <Card
+              sx={{
+                height: 320,
+                cursor: "pointer",
+                transition: "transform 0.3s",
+                "&:hover": {
+                  transform: "translateY(-8px)",
+                },
+              }}
+              onClick={() => navigate("/products?category=sets")}
+            >
+              <CardMedia
+                component="img"
+                height="200"
+                image="https://placehold.jp/3d4070/ffffff/600x400.png?text=Gift+Sets"
+                alt="Gift Sets"
+              />
+              <CardContent>
+                <Typography variant="h6" component="h3" gutterBottom>
+                  Gift Sets
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Perfect bundles for gifting or trying new products
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
         </Grid>
       </Container>
 
@@ -262,7 +289,7 @@ const Home = () => {
           <Grid item xs={12} md={6}>
             <Box
               component="img"
-              src="https://images.pexels.com/photos/1377034/pexels-photo-1377034.jpeg?auto=compress&cs=tinysrgb&w=600"
+              src="https://placehold.jp/3d4070/ffffff/800x600.png?text=About+Us"
               alt="About Us"
               sx={{
                 width: "100%",

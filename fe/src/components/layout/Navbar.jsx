@@ -35,7 +35,10 @@ import {
 } from "@mui/icons-material";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { selectCartItemCount } from "../../store/slices/cartSlice";
+import {
+  selectCartItemCount,
+  selectWishlistCount,
+} from "../../store/slices/cartSlice";
 
 const Navbar = () => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -46,6 +49,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const cartItemCount = useSelector(selectCartItemCount);
+  const wishListCount = useSelector(selectWishlistCount);
 
   // Check if user is logged in
   const checkUserAuth = () => {
@@ -102,6 +106,7 @@ const Navbar = () => {
   const menuItems = [
     { text: "Quiz", path: "/quiz" },
     { text: "Products", path: "/products" },
+    { text: "About", path: "/about" },
   ];
 
   // Add authenticated-only menu items
@@ -368,14 +373,16 @@ const Navbar = () => {
                   variant="outlined"
                 />
               )}
-              <IconButton color="inherit" onClick={() => navigate("/search")}>
+              <IconButton color="inherit" onClick={() => navigate("/products")}>
                 <Search />
               </IconButton>
               <IconButton
                 color="inherit"
                 onClick={() => navigate("/favorites")}
               >
-                <Favorite />
+                <Badge badgeContent={wishListCount} color="error">
+                  <Favorite />
+                </Badge>
               </IconButton>
               <IconButton color="inherit" onClick={() => navigate("/cart")}>
                 <Badge badgeContent={cartItemCount} color="error">

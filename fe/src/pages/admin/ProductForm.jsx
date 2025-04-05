@@ -395,7 +395,7 @@ const ProductForm = () => {
                         helperText={touched.price && errors.price}
                         margin="normal"
                         required
-                        InputProps={{ startAdornment: "VND" }}
+                        InputProps={{ startAdornment: "$" }}
                       />
 
                       <TextField
@@ -412,7 +412,18 @@ const ProductForm = () => {
                         required
                       />
 
-                      
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            name="isDeleted"
+                            checked={values.isDeleted}
+                            onChange={handleChange}
+                            color="primary"
+                          />
+                        }
+                        label="Inactive"
+                        sx={{ mt: 2 }}
+                      />
                     </Grid>
 
                     <Grid item xs={12}>
