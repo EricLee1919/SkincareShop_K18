@@ -106,7 +106,6 @@ const Navbar = () => {
   const menuItems = [
     { text: "Quiz", path: "/quiz" },
     { text: "Products", path: "/products" },
-    { text: "About", path: "/about" },
   ];
 
   // Add authenticated-only menu items
