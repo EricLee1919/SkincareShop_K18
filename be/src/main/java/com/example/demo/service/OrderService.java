@@ -49,7 +49,6 @@ public class OrderService {
     AuthenticationRepository authenticationRepository;
 
     public String create(OrderRequest orderRequest) throws Exception{
-
         float total = 0;
 
         List<OrderDetail> orderDetails = new ArrayList<>();
@@ -78,7 +77,7 @@ public class OrderService {
 
                 total += orderDetail.getPrice();
             }else {
-                throw new RuntimeException("quantity is not enough");
+                throw new RuntimeException("Quantity of "+product.getName()+" is not enough");
             }
         }
         order.setTotal(total - orderRequest.getPoint() * 1000);
@@ -188,6 +187,10 @@ public class OrderService {
 
     public List<Order> getAll() {
         return orderRepository.findAll();
+    }
+
+    public Order getById(long orderId) {
+        return orderRepository.findOrderById(orderId);
     }
 
     public OrderDetail rating(long id, RatingRequest ratingRequest){

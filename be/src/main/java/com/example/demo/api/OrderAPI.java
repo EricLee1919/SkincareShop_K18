@@ -41,6 +41,12 @@ public class OrderAPI {
         return ResponseEntity.ok(orders);
     }
 
+    @GetMapping("{id}")
+    public ResponseEntity getById(@PathVariable long id){
+        Order order = orderService.getById(id);
+        return ResponseEntity.ok(order);
+    }
+
     @GetMapping("/user")
     public ResponseEntity getOrdersByUser(){
         List<Order> orders = orderService.getOrdersByUser();

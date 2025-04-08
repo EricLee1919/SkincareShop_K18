@@ -20,7 +20,6 @@ import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import PaymentResult from "./pages/PaymentResult";
 import OrderSummary from "./pages/OrderSummary";
-import About from "./pages/About";
 
 // Admin Pages
 import AdminDashboard from "./pages/Admin/Dashboard";
@@ -30,6 +29,7 @@ import Categories from "./pages/Admin/Categories";
 import QuizTest from "./pages/Quiz";
 import WishList from "./pages/WishList";
 import AccountManagement from "./pages/account";
+import QuestionOptionManager from "./pages/admin/Question";
 
 // Create theme
 const theme = createTheme({
@@ -169,14 +169,6 @@ const App = () => {
             element={
               <Layout>
                 <Home />
-              </Layout>
-            }
-          />
-          <Route
-            path="/about"
-            element={
-              <Layout>
-                <About />
               </Layout>
             }
           />
@@ -368,6 +360,17 @@ const App = () => {
               <AdminRoute>
                 <AdminLayout>
                   <Categories />
+                </AdminLayout>
+              </AdminRoute>
+            }
+          />
+
+          <Route
+            path="/admin/question"
+            element={
+              <AdminRoute>
+                <AdminLayout>
+                  <QuestionOptionManager />
                 </AdminLayout>
               </AdminRoute>
             }

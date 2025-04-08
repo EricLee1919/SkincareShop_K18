@@ -120,7 +120,7 @@ const Checkout = () => {
     } catch (err) {
       console.error("Error creating order:", err);
       setError(
-        err.response?.data?.message ||
+        err.response?.data ||
           err.message ||
           "Failed to place order. Please try again."
       );

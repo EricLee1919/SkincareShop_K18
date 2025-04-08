@@ -13,7 +13,6 @@ import {
   Checkbox,
   FormControlLabel,
   FormGroup,
-  TextField,
 } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -49,15 +48,18 @@ const Products = ({ type }) => {
       ? products.filter((product) => !product.isDeleted)
       : [];
 
+    // Category filter
     if (filters.category) {
       filtered = filtered.filter((p) => p.category?.id === filters.category);
     }
 
+    // Price range filter
     filtered = filtered.filter(
       (p) =>
         p.price >= filters.priceRange[0] && p.price <= filters.priceRange[1]
     );
 
+    // Rating filter
     filtered = filtered.filter((p) => {
       const avgRating =
         p.feedback && p.feedback.length > 0
@@ -66,17 +68,20 @@ const Products = ({ type }) => {
       return avgRating >= filters.rating;
     });
 
+    // Skin type filter
     if (filters.suitableTypes.length > 0) {
       filtered = filtered.filter((p) =>
         filters.suitableTypes.some((type) => p.suitableTypes?.includes(type))
       );
     }
 
+    // Search term filter
     if (searchTerm.trim()) {
       const keyword = searchTerm.trim().toLowerCase();
       filtered = filtered.filter((p) => p.name.toLowerCase().includes(keyword));
     }
 
+    // Sort
     switch (sortBy) {
       case "priceAsc":
         filtered.sort((a, b) => a.price - b.price);
@@ -132,7 +137,11 @@ const Products = ({ type }) => {
   };
 
   return (
-    <div style={{ backgroundColor: "#f5f5f5" }}>
+    <div
+      style={{
+        backgroundColor: "#f5f5f5",
+      }}
+    >
       <Container maxWidth="xl" sx={{ py: 4 }}>
         <Typography variant="h4" gutterBottom>
           Our Products
@@ -221,21 +230,10 @@ const Products = ({ type }) => {
               sx={{
                 mb: 3,
                 display: "flex",
-                justifyContent: "space-between",
+                justifyContent: "flex-end",
                 alignItems: "center",
-                flexWrap: "wrap",
-                gap: 2,
               }}
             >
-              <TextField
-                label="Search by name"
-                variant="outlined"
-                size="small"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                sx={{ width: 300 }}
-              />
-
               <FormControl sx={{ minWidth: 200 }}>
                 <InputLabel>Sort By</InputLabel>
                 <Select

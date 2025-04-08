@@ -40,7 +40,7 @@ public class VNPayController {
         boolean isSuccess = "00".equals(vnpResponseCode);
         orderService.updateOrderStatus(Long.parseLong(vnpTxnRef), isSuccess ? OrderStatus.PAID : OrderStatus.CANCEL);
 
-        String redirectUrl = "http://localhost:5173/orders" + "?status=" + (isSuccess ? "success" : "fail");
+        String redirectUrl = "http://localhost:5173/payment/result?orderId=" + Long.parseLong(vnpTxnRef);
         response.sendRedirect(redirectUrl);
 
         return ResponseEntity.ok().build();

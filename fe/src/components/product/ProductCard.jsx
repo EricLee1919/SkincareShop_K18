@@ -47,22 +47,7 @@ const ProductCard = ({ product }) => {
     }
   };
 
-  const handleOnClick = (e) => {
-    // Check if the click is on any interactive element
-    const isInteractiveElement =
-      e.target.closest("button") ||
-      e.target.closest("svg") ||
-      e.target.closest(".MuiIconButton-root") ||
-      e.target.closest(".MuiButton-root") ||
-      e.target.closest(".MuiTooltip-root") ||
-      e.target.closest(".MuiIcon-root") ||
-      e.target.closest(".MuiTouchRipple-root");
-
-    if (isInteractiveElement) {
-      e.preventDefault();
-      e.stopPropagation();
-      return;
-    }
+  const handleOnClick = () => {
     navigate(`/products/${product.id}`);
   };
 
@@ -183,16 +168,7 @@ const ProductCard = ({ product }) => {
           <Tooltip
             title={isFavorite ? "Remove from favorites" : "Add to favorites"}
           >
-            <IconButton
-              onClick={handleToggleFavorite}
-              color="primary"
-              sx={{
-                "&:hover": {
-                  backgroundColor: "rgba(156, 39, 176, 0.04)",
-                },
-                zIndex: 2, // Add z-index to ensure button is clickable
-              }}
-            >
+            <IconButton onClick={handleToggleFavorite} color="primary">
               {isFavorite ? <Favorite /> : <FavoriteBorder />}
             </IconButton>
           </Tooltip>

@@ -41,6 +41,8 @@ public class Account implements UserDetails {
     public String phone;
     public String address;
     public int point = 0;
+    public boolean isBlocked = false;
+
 
     @Enumerated(value = EnumType.STRING)
     public RoleEnum roleEnum;
@@ -80,7 +82,7 @@ public class Account implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return UserDetails.super.isAccountNonLocked();
+        return !this.isBlocked;
     }
 
     @Override
